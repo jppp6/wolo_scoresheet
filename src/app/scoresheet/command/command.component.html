@@ -1,8 +1,25 @@
-<mat-card class="flex-box h100">
+<mat-card class="flex-center" style="background-color: #e8ecf1">
   <mat-form-field>
     <mat-label>Command Input</mat-label>
-    <input matInput type="text" [(ngModel)]="command" />
-    <button matSuffix mat-icon-button>
+    <input
+      matInput
+      type="text"
+      [formControl]="command"
+      #trigger="matAutocompleteTrigger"
+      (keydown.enter)="parseCommand(); trigger.openPanel()"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-option *ngFor="let option of options | async" [value]="option">
+        {{ option }}
+      </mat-option>
+    </mat-autocomplete>
+
+    <button
+      matSuffix
+      mat-icon-button
+      (click)="$event.stopPropagation(); openHelpPage()"
+    >
       <mat-icon>question_mark</mat-icon>
     </button>
   </mat-form-field>

@@ -3,19 +3,6 @@
 /* Quartz Theme Specific CSS */
 @import "ag-grid-community/styles/ag-theme-alpine.css";
 
-.ag-header-cell {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.w100 {
-  width: 100%;
-}
-.h100 {
-  height: 100%;
-  margin: 0;
-}
-
 html,
 body {
   height: 100%;
@@ -23,8 +10,31 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-.flex-box {
+.ag-header-cell,
+.ag-header-group-cell {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.h100 {
+  height: 100%;
+}
+
+.flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
+}
+
+.flex-box {
+  display: flex;
+}
+
+.input-field {
+  width: 33%;
 }

@@ -56,4 +56,13 @@ export class SupabaseService {
   addTeam(team: StoredTeamModel) {
     return this.supabase.from('teams').insert(team);
   }
+
+  getTeams(user: User) {
+    return this.supabase
+      .from('teams')
+      .select(
+        'team_id, team_name, coach, assistant1, assistant2, players, last_updates'
+      )
+      .eq('id', user.id);
+  }
 }

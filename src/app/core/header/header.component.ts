@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngxs/store';
-import { Game } from 'src/app/core/actions/game.actions';
 import { AuthComponent } from 'src/app/core/auth/auth.component';
 import { SupabaseService } from 'src/app/core/services/supabase.service';
+import { HelpComponent } from 'src/app/scoresheet/help/help.component';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +14,7 @@ export class HeaderComponent implements OnInit {
   session = this.supabase.session;
 
   constructor(
-    public dialog: MatDialog,
+    private dialog: MatDialog,
     private store: Store,
     private readonly supabase: SupabaseService
   ) {}
@@ -25,8 +25,9 @@ export class HeaderComponent implements OnInit {
 
   // General users
   openHelpPage(): void {
-    console.log('openHelpPage');
-    this.store.dispatch(new Game.Delete());
+    this.dialog.open(HelpComponent, {
+      width: '750px',
+    });
   }
 
   signIn(): void {
@@ -44,9 +45,9 @@ export class HeaderComponent implements OnInit {
   }
 
   newGame(): void {
-    this.store.dispatch(new Game.Save()).subscribe((_) => {
-      this.store.dispatch(new Game.Create());
-    });
+    // this.store.dispatch(new Game.Save()).subscribe((_) => {
+    // this.store.dispatch(new Game.Create());
+    // });
   }
 
   async signOut() {

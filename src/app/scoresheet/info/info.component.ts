@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { Information } from 'src/app/core/actions/info.actions';
+import { Info } from 'src/app/core/actions/info.actions';
 import { WoloState } from 'src/app/core/states/state';
 import { InfoModel } from 'src/app/core/utils/models';
+
 @Component({
   selector: 'app-info',
   templateUrl: './info.component.html',
@@ -20,21 +21,20 @@ export class InfoComponent implements OnInit {
       this.info = { ...selectInfo } as InfoModel;
     });
   }
+
   updateInfoModel(field: string): void {
     if (field === 'gamenumber') {
-      this.store.dispatch(
-        new Information.UpdateGameNumber(this.info.gameNumber)
-      );
+      this.store.dispatch(new Info.UpdateGameNumber(this.info.gameNumber));
     } else if (field === 'location') {
-      this.store.dispatch(new Information.UpdateLocation(this.info.location));
+      this.store.dispatch(new Info.UpdateLocation(this.info.location));
     } else if (field === 'league') {
-      this.store.dispatch(new Information.UpdateLeague(this.info.league));
+      this.store.dispatch(new Info.UpdateLeague(this.info.league));
     } else if (field === 'category') {
-      this.store.dispatch(new Information.UpdateCategory(this.info.category));
+      this.store.dispatch(new Info.UpdateCategory(this.info.category));
     } else if (field === 'date') {
-      this.store.dispatch(new Information.UpdateDate(this.info.date));
+      this.store.dispatch(new Info.UpdateDate(this.info.date));
     } else if (field === 'starttime') {
-      this.store.dispatch(new Information.UpdateStartTime(this.info.startTime));
+      this.store.dispatch(new Info.UpdateStartTime(this.info.startTime));
     }
   }
 }

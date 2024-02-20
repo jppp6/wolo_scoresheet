@@ -17,6 +17,10 @@ export namespace Team {
   export class Delete {
     static readonly type = '[Team] Delete';
   }
+  export class UpdateTeamName {
+    static readonly type = '[Team] Update Team Name';
+    constructor(public color: 'home' | 'away', public value: string) {}
+  }
 
   export class UpdateCoach {
     static readonly type = '[Team] Update Coach';

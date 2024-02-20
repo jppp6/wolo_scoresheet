@@ -1,12 +1,8 @@
-<div class="w100 h100" *ngIf="events$ | async as events">
-  <ag-grid-angular
-    class="ag-theme-alpine"
-    style="height: 100%; width: 100%"
-    [rowHeight]="20"
-    [headerHeight]="30"
-    [rowData]="events"
-    [gridOptions]="gridOptions"
-    [columnDefs]="colDefs"
-  >
-  </ag-grid-angular>
-</div>
+<ag-grid-angular
+  *ngIf="events$ | async as events"
+  class="ag-theme-alpine w100 h100"
+  [rowData]="events"
+  [gridOptions]="gridOptions"
+  [columnDefs]="colDefs"
+>
+</ag-grid-angular>

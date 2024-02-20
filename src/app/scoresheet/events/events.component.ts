@@ -4,6 +4,7 @@ import { ColDef, GridOptions } from 'ag-grid-community';
 import { Observable } from 'rxjs';
 import { WoloState } from 'src/app/core/states/state';
 import { EventsModel } from 'src/app/core/utils/models';
+
 @Component({
   selector: 'app-events',
   templateUrl: './events.component.html',
@@ -11,9 +12,9 @@ import { EventsModel } from 'src/app/core/utils/models';
 })
 export class EventsComponent {
   @Select(WoloState.selectEvents) events$!: Observable<EventsModel[]>;
-  // Row Data: The data to be displayed.
+
   gridOptions: GridOptions = {
-    headerHeight: 32,
+    headerHeight: 24,
     rowHeight: 24,
     defaultColDef: {
       flex: 1,
@@ -23,10 +24,10 @@ export class EventsComponent {
       cellStyle: { padding: 0 },
     },
   };
-  // Column Definitions: Defines & controls grid columns.
+
   colDefs: ColDef[] = [
     { field: 'number', headerName: '#' },
-    { field: 'color', headerName: 'Color' },
+    { field: 'teamColor', headerName: 'Color' },
     { field: 'incident', headerName: 'Incident' },
     { field: 'time', headerName: 'Time' },
     { field: 'homeScore', headerName: 'Home' },

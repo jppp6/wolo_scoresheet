@@ -1,5 +1,16 @@
-<div class="flex-box" style="margin-top: 16px">
+<div class="flex-center" style="padding-top: 16px">
   <div class="flex" style="width: 50%" *ngIf="homeModel">
+    <div class="flex-box">
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Home Team</mat-label>
+        <input matInput [(ngModel)]="homeModel.teamName" />
+      </mat-form-field>
+      <span style="flex: 1 1 auto"></span>
+      <button mat-icon-button (click)="openTeamSelect('home')" *ngIf="session">
+        <mat-icon>cloud</mat-icon>
+      </button>
+    </div>
+
     <mat-form-field class="input-field">
       <mat-label>Head Coach</mat-label>
       <input
@@ -37,6 +48,16 @@
   </div>
 
   <div class="flex" style="width: 50%" *ngIf="awayModel">
+    <div class="flex-box">
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Away Team</mat-label>
+        <input matInput [(ngModel)]="awayModel.teamName" />
+      </mat-form-field>
+      <span style="flex: 1 1 auto"></span>
+      <button mat-icon-button (click)="openTeamSelect('away')">
+        <mat-icon>cloud</mat-icon>
+      </button>
+    </div>
     <mat-form-field class="input-field">
       <mat-label>Head Coach</mat-label>
       <input

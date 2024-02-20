@@ -6,13 +6,13 @@ export interface StateModel {
 
 export interface TeamModel {
   teamId: string;
-  name: string;
+  teamName: string;
   coach: string;
   assistant1: string;
   assistant2: string;
   players: Player[];
   timeouts: string[];
-  capChanges: string[];
+  capSwaps: string[];
   cards: string[];
 }
 
@@ -28,8 +28,8 @@ export interface StoredTeamModel {
 export interface InfoModel {
   gameId: string;
   gameNumber: string;
-  lightScore: number;
-  darkScore: number;
+  homeScore: number;
+  awayScore: number;
   quarter: number;
   location: string;
   startTime: string;
@@ -45,9 +45,9 @@ export interface InfoModel {
 }
 
 export interface EventsModel {
-  eventId: string;
-  number: number;
-  color: string;
+  eventId: number;
+  number: string;
+  teamColor: string;
   incident: string;
   time: string;
   homeScore: number;

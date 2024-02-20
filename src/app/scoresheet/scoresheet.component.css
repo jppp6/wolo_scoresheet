@@ -8,7 +8,7 @@
     "teams teams events";
 }
 
-@media screen and (max-width: 1100px) {
+@media screen and (max-width: 1300px) {
   .layout-container {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 175px 175px 442px;
