@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Sign in via magic link with your email below</h2>
+
+<mat-dialog-content>
+  <mat-form-field class="w100">
+    <mat-label>Your Email</mat-label>
+    <input
+      matInput
+      placeholder="johndoe@example.com"
+      [formControl]="signInEmail"
+    />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    (click)="signUp()"
+    [disabled]="signInEmail.invalid || signInEmail.value === ''"
+  >
+    Send magic link
+  </button>
+</mat-dialog-actions>

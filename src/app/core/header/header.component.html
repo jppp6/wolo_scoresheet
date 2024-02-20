@@ -1,0 +1,27 @@
+<mat-toolbar style="background-color: #b2beb5">
+  Wolo Game Sheet
+  <span style="flex: 1 1 auto"></span>
+
+  <div *ngIf="session; else nosession">
+    <button mat-button (click)="newGame()"><mat-icon>add</mat-icon>New</button>
+    <button mat-button (click)="saveGame()">
+      <mat-icon>backup</mat-icon>Save
+    </button>
+    <button mat-button (click)="loadGame()">
+      <mat-icon>cached</mat-icon>Load
+    </button>
+    <button mat-button (click)="openHelpPage()">
+      <mat-icon>help_outline</mat-icon>Help
+    </button>
+    <button mat-button (click)="signOut()">
+      <mat-icon>logout</mat-icon>Log Out
+    </button>
+  </div>
+
+  <ng-template #nosession>
+    <button mat-button><mat-icon>help_outline</mat-icon>Help</button>
+    <button mat-button (click)="signIn()">
+      <mat-icon>login</mat-icon>Log In
+    </button>
+  </ng-template>
+</mat-toolbar>

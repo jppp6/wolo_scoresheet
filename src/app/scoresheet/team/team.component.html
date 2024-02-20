@@ -1,0 +1,75 @@
+<div class="flex-box" style="margin-top: 16px">
+  <div class="flex" style="width: 50%" *ngIf="homeModel">
+    <mat-form-field class="input-field">
+      <mat-label>Head Coach</mat-label>
+      <input
+        matInput
+        [(ngModel)]="homeModel.coach"
+        (blur)="updateCoach('home')"
+      />
+    </mat-form-field>
+    <mat-form-field class="input-field">
+      <mat-label>Assistant Coach 1</mat-label>
+      <input
+        matInput
+        [(ngModel)]="homeModel.assistant1"
+        (blur)="updateAssistant1('home')"
+      />
+    </mat-form-field>
+    <mat-form-field class="input-field">
+      <mat-label>Assistant Coach 2</mat-label>
+      <input
+        matInput
+        [(ngModel)]="homeModel.assistant2"
+        (blur)="updateAssistant2('home')"
+      />
+    </mat-form-field>
+
+    <ag-grid-angular
+      class="ag-theme-alpine"
+      domLayout="autoHeight"
+      [rowData]="homeModel.players"
+      [columnDefs]="colDefs"
+      [gridOptions]="gridOptions"
+      (cellValueChanged)="updatePlayers('home')"
+    >
+    </ag-grid-angular>
+  </div>
+
+  <div class="flex" style="width: 50%" *ngIf="awayModel">
+    <mat-form-field class="input-field">
+      <mat-label>Head Coach</mat-label>
+      <input
+        matInput
+        [(ngModel)]="awayModel.coach"
+        (blur)="updateCoach('away')"
+      />
+    </mat-form-field>
+    <mat-form-field class="input-field">
+      <mat-label>Assistant Coach 1</mat-label>
+      <input
+        matInput
+        [(ngModel)]="awayModel.assistant1"
+        (blur)="updateAssistant1('away')"
+      />
+    </mat-form-field>
+    <mat-form-field class="input-field">
+      <mat-label>Assistant Coach 2</mat-label>
+      <input
+        matInput
+        [(ngModel)]="awayModel.assistant2"
+        (blur)="updateAssistant2('away')"
+      />
+    </mat-form-field>
+
+    <ag-grid-angular
+      class="ag-theme-alpine"
+      domLayout="autoHeight"
+      [rowData]="awayModel.players"
+      [columnDefs]="colDefs"
+      [gridOptions]="gridOptions"
+      (cellValueChanged)="updatePlayers('away')"
+    >
+    </ag-grid-angular>
+  </div>
+</div>

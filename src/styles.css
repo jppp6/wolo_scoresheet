@@ -1,1 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
+/* Core Grid CSS */
+@import "ag-grid-community/styles/ag-grid.css";
+/* Quartz Theme Specific CSS */
+@import "ag-grid-community/styles/ag-theme-alpine.css";
+
+.ag-header-cell {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.w100 {
+  width: 100%;
+}
+.h100 {
+  height: 100%;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.flex-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
