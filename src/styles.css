@@ -5,36 +5,37 @@
 
 html,
 body {
-  height: 100%;
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+    height: 100%;
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: #e8ecf1;
 }
 
 .ag-header-cell,
 .ag-header-group-cell {
-  padding-left: 0px;
-  padding-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .w100 {
-  width: 100%;
+    width: 100%;
 }
 
 .h100 {
-  height: 100%;
+    height: 100%;
 }
 
 .flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
 .flex-box {
-  display: flex;
+    display: flex;
 }
 
 .input-field {
-  width: 33%;
+    width: 33%;
 }

@@ -1,60 +1,60 @@
 <mat-card class="info-card">
-  <mat-card-content>
-    <mat-form-field class="input-field">
-      <mat-label>Game Number</mat-label>
-      <input
-        matInput
-        [(ngModel)]="info.gameNumber"
-        (blur)="updateInfoModel('gamenumber')"
-      />
-    </mat-form-field>
+    <mat-card-content>
+        <mat-form-field class="input-field">
+            <mat-label>Game Number</mat-label>
+            <input
+                matInput
+                [(ngModel)]="info.gameNumber"
+                (blur)="updateInfoModel('gamenumber')"
+            />
+        </mat-form-field>
 
-    <mat-form-field class="input-field">
-      <mat-label>Location</mat-label>
-      <input
-        matInput
-        [(ngModel)]="info.location"
-        (blur)="updateInfoModel('location')"
-      />
-    </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Location</mat-label>
+            <input
+                matInput
+                [(ngModel)]="info.location"
+                (blur)="updateInfoModel('location')"
+            />
+        </mat-form-field>
 
-    <mat-form-field class="input-field">
-      <mat-label>League</mat-label>
-      <input
-        matInput
-        [(ngModel)]="info.league"
-        (blur)="updateInfoModel('league')"
-      />
-    </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>League</mat-label>
+            <input
+                matInput
+                [(ngModel)]="info.league"
+                (blur)="updateInfoModel('league')"
+            />
+        </mat-form-field>
 
-    <mat-form-field class="input-field">
-      <mat-label>Category</mat-label>
-      <input
-        matInput
-        [(ngModel)]="info.category"
-        (blur)="updateInfoModel('category')"
-      />
-    </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Category</mat-label>
+            <input
+                matInput
+                [(ngModel)]="info.category"
+                (blur)="updateInfoModel('category')"
+            />
+        </mat-form-field>
 
-    <mat-form-field class="input-field" (click)="picker.open()">
-      <mat-label>Date</mat-label>
-      <input
-        matInput
-        readonly
-        [matDatepicker]="picker"
-        [(ngModel)]="info.date"
-        (ngModelChange)="updateInfoModel('date')"
-      />
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
+        <mat-form-field class="input-field" (click)="picker.open()">
+            <mat-label>Date</mat-label>
+            <input
+                matInput
+                readonly
+                [matDatepicker]="picker"
+                [(ngModel)]="info.date"
+                (ngModelChange)="updateInfoModel('date')"
+            />
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
 
-    <mat-form-field class="input-field">
-      <mat-label>Time</mat-label>
-      <input
-        matInput
-        [(ngModel)]="info.startTime"
-        (blur)="updateInfoModel('time')"
-      />
-    </mat-form-field>
-  </mat-card-content>
+        <mat-form-field class="input-field">
+            <mat-label>Time</mat-label>
+            <input
+                matInput
+                [(ngModel)]="info.startTime"
+                (blur)="updateInfoModel('time')"
+            />
+        </mat-form-field>
+    </mat-card-content>
 </mat-card>

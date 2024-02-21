@@ -1,1 +1,13 @@
-<p>team-select works!</p>
+<mat-card *ngFor="let item of data.options" (click)="selectTeam(item)">
+    <mat-card-header>
+        <mat-card-title>Team name: {{ item.teamName }} </mat-card-title>
+        <mat-card-subtitle
+            >Last Updated:
+            {{ item.lastUpdated | date : "medium" }}</mat-card-subtitle
+        >
+    </mat-card-header>
+    <mat-card-content>
+        Coach:
+        {{ item.coach }}
+    </mat-card-content>
+</mat-card>

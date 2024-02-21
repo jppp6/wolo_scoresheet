@@ -1,68 +1,109 @@
 import { Injectable } from '@angular/core';
 import {
-  AuthChangeEvent,
-  AuthSession,
-  createClient,
-  Session,
-  SupabaseClient,
-  User,
+    AuthChangeEvent,
+    AuthSession,
+    createClient,
+    Session,
+    SupabaseClient,
+    User,
 } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
-import { StoredTeamModel } from '../utils/models';
+import { StateModel, TeamModel } from '../utils/models';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
-  _session: AuthSession | null = null;
+    private supabase: SupabaseClient;
+    _session: AuthSession | null = null;
 
-  constructor() {
-    this.supabase = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
-    );
-  }
+    constructor() {
+        this.supabase = createClient(
+            environment.supabaseUrl,
+            environment.supabaseKey
+        );
+    }
 
-  get session() {
-    this.supabase.auth.getSession().then(({ data }) => {
-      this._session = data.session;
-    });
-    return this._session;
-  }
+    get session() {
+        this.supabase.auth.getSession().then(({ data }) => {
+            this._session = data.session;
+        });
+        return this._session;
+    }
 
-  profile(user: User) {
-    return this.supabase
-      .from('profiles')
-      .select(`username, website, avatar_url`)
-      .eq('id', user.id)
-      .single();
-  }
+    async upsertGame(user: User, gameModel: StateModel) {
+        const game = {
+            game_id: gameModel.gameId,
+            last_updated: new Date(),
+            user_id: user.id,
+            info: gameModel.info,
+            home: gameModel.home,
+            away: gameModel.away,
+        };
+        return await this.supabase
+            .from('games')
+            .upsert(game, { onConflict: 'game_id' });
+    }
 
-  authChanges(
-    callback: (event: AuthChangeEvent, session: Session | null) => void
-  ) {
-    return this.supabase.auth.onAuthStateChange(callback);
-  }
+    async getGames(user: User) {
+        const { data, error } = await this.supabase
+            .from('games')
+            .select('game_id, home, away, info, last_updated')
+            .eq('user_id', user.id);
 
-  signIn(email: string) {
-    return this.supabase.auth.signInWithOtp({ email });
-  }
+        if (error) {
+            console.error('Error fetching games:', error.message);
+            return [];
+        }
 
-  signOut() {
-    return this.supabase.auth.signOut();
-  }
+        return data;
+    }
 
-  addTeam(team: StoredTeamModel) {
-    return this.supabase.from('teams').insert(team);
-  }
+    async upsertTeam(user: User, teamModel: TeamModel) {
+        const team = {
+            team_id: teamModel.teamId,
+            last_updated: new Date(),
+            user_id: user.id,
+            team_name: teamModel.teamName,
+            coach: teamModel.coach,
+            assistant1: teamModel.assistant1,
+            assistant2: teamModel.assistant2,
+            players: teamModel.players.map((p) =>
+                Object({ name: p.name, number: p.number })
+            ),
+        };
+        return await this.supabase
+            .from('teams')
+            .upsert(team, { onConflict: 'team_id' });
+    }
 
-  getTeams(user: User) {
-    return this.supabase
-      .from('teams')
-      .select(
-        'team_id, team_name, coach, assistant1, assistant2, players, last_updates'
-      )
-      .eq('id', user.id);
-  }
+    async getTeams(user: User) {
+        const { data, error } = await this.supabase
+            .from('teams')
+            .select(
+                'team_id, team_name, coach, assistant1, assistant2, players, last_updated'
+            )
+            .eq('user_id', user.id);
+
+        if (error) {
+            console.error('Error fetching teams:', error.message);
+            return [];
+        }
+
+        return data;
+    }
+
+    authChanges(
+        callback: (event: AuthChangeEvent, session: Session | null) => void
+    ) {
+        return this.supabase.auth.onAuthStateChange(callback);
+    }
+
+    signIn(email: string) {
+        return this.supabase.auth.signInWithOtp({ email });
+    }
+
+    signOut() {
+        return this.supabase.auth.signOut();
+    }
 }

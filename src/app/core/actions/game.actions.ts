@@ -1,26 +1,16 @@
+import { StateModel } from '../utils/models';
+
 export namespace Game {
-  export class Create {
-    static readonly type = '[Game] Create';
-  }
+    export class New {
+        static readonly type = '[Game] New';
+    }
 
-  export class GetAll {
-    static readonly type = '[Game] Get All';
-  }
+    export class Upsert {
+        static readonly type = '[Game] Upsert';
+    }
 
-  export class GetOne {
-    static readonly type = '[Game] Get One';
-    constructor(public gameId: string) {}
-  }
-
-  export class Update {
-    static readonly type = '[Game] Update';
-  }
-
-  export class Delete {
-    static readonly type = '[Game] Delete';
-  }
-
-  export class Save {
-    static readonly type = '[Game] Save';
-  }
+    export class Patch {
+        static readonly type = '[Game] Patch';
+        constructor(public gameModel: StateModel) {}
+    }
 }

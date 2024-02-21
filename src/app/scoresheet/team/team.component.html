@@ -1,96 +1,163 @@
-<div class="flex-center" style="padding-top: 16px">
-  <div class="flex" style="width: 50%" *ngIf="homeModel">
-    <div class="flex-box">
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>Home Team</mat-label>
-        <input matInput [(ngModel)]="homeModel.teamName" />
-      </mat-form-field>
-      <span style="flex: 1 1 auto"></span>
-      <button mat-icon-button (click)="openTeamSelect('home')" *ngIf="session">
-        <mat-icon>cloud</mat-icon>
-      </button>
+<div class="flex-center">
+    <div
+        class="flex"
+        style="width: 50%; background-color: #d8e1d5; padding-top: 16px"
+        *ngIf="homeModel"
+    >
+        <div class="flex-box">
+            <mat-form-field class="input-field" subscriptSizing="dynamic">
+                <mat-label>Home/Light Team</mat-label>
+                <input
+                    matInput
+                    [(ngModel)]="homeModel.teamName"
+                    (blur)="updateTeamName('home')"
+                />
+            </mat-form-field>
+
+            <span style="flex: 1 1 auto"></span>
+
+            <button
+                mat-icon-button
+                matTooltip="Save team to your account"
+                (click)="upsertTeam('home')"
+                *ngIf="!!session && !checkIfExists(homeModel)"
+            >
+                <mat-icon>add</mat-icon>
+            </button>
+            <button
+                mat-icon-button
+                matTooltip="Update team"
+                (click)="upsertTeam('home')"
+                *ngIf="
+                    !!session && checkIfExists(homeModel) && !homeModel.saved
+                "
+            >
+                <mat-icon>cloud_upload</mat-icon>
+            </button>
+            <button
+                mat-icon-button
+                matTooltip="Open game selector"
+                (click)="openTeamSelect('home')"
+                *ngIf="!!session"
+            >
+                <mat-icon>list</mat-icon>
+            </button>
+        </div>
+
+        <mat-form-field class="input-field">
+            <mat-label>Head Coach</mat-label>
+            <input
+                matInput
+                [(ngModel)]="homeModel.coach"
+                (blur)="updateCoach('home')"
+            />
+        </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Assistant Coach 1</mat-label>
+            <input
+                matInput
+                [(ngModel)]="homeModel.assistant1"
+                (blur)="updateAssistant1('home')"
+            />
+        </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Assistant Coach 2</mat-label>
+            <input
+                matInput
+                [(ngModel)]="homeModel.assistant2"
+                (blur)="updateAssistant2('home')"
+            />
+        </mat-form-field>
+
+        <ag-grid-angular
+            class="ag-theme-alpine"
+            domLayout="autoHeight"
+            [rowData]="homeModel.players"
+            [columnDefs]="colDefs"
+            [gridOptions]="gridOptions"
+            (cellValueChanged)="updatePlayers('home')"
+        >
+        </ag-grid-angular>
     </div>
 
-    <mat-form-field class="input-field">
-      <mat-label>Head Coach</mat-label>
-      <input
-        matInput
-        [(ngModel)]="homeModel.coach"
-        (blur)="updateCoach('home')"
-      />
-    </mat-form-field>
-    <mat-form-field class="input-field">
-      <mat-label>Assistant Coach 1</mat-label>
-      <input
-        matInput
-        [(ngModel)]="homeModel.assistant1"
-        (blur)="updateAssistant1('home')"
-      />
-    </mat-form-field>
-    <mat-form-field class="input-field">
-      <mat-label>Assistant Coach 2</mat-label>
-      <input
-        matInput
-        [(ngModel)]="homeModel.assistant2"
-        (blur)="updateAssistant2('home')"
-      />
-    </mat-form-field>
-
-    <ag-grid-angular
-      class="ag-theme-alpine"
-      domLayout="autoHeight"
-      [rowData]="homeModel.players"
-      [columnDefs]="colDefs"
-      [gridOptions]="gridOptions"
-      (cellValueChanged)="updatePlayers('home')"
+    <div
+        class="flex"
+        style="width: 50%; background-color: #939f96; padding-top: 16px"
+        *ngIf="awayModel"
     >
-    </ag-grid-angular>
-  </div>
+        <div class="flex-box">
+            <mat-form-field class="input-field" subscriptSizing="dynamic">
+                <mat-label>Away/Dark Team</mat-label>
+                <input
+                    matInput
+                    [(ngModel)]="awayModel.teamName"
+                    (blur)="updateTeamName('away')"
+                />
+            </mat-form-field>
 
-  <div class="flex" style="width: 50%" *ngIf="awayModel">
-    <div class="flex-box">
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>Away Team</mat-label>
-        <input matInput [(ngModel)]="awayModel.teamName" />
-      </mat-form-field>
-      <span style="flex: 1 1 auto"></span>
-      <button mat-icon-button (click)="openTeamSelect('away')">
-        <mat-icon>cloud</mat-icon>
-      </button>
+            <span style="flex: 1 1 auto"></span>
+
+            <button
+                mat-icon-button
+                matTooltip="Save team to your account"
+                (click)="upsertTeam('away')"
+                *ngIf="!!session && !checkIfExists(awayModel)"
+            >
+                <mat-icon>add</mat-icon>
+            </button>
+            <button
+                mat-icon-button
+                matTooltip="Update team"
+                (click)="upsertTeam('away')"
+                *ngIf="
+                    !!session && checkIfExists(awayModel) && !awayModel.saved
+                "
+            >
+                <mat-icon>cloud_upload</mat-icon>
+            </button>
+            <button
+                mat-icon-button
+                matTooltip="Open game selector"
+                (click)="openTeamSelect('away')"
+                *ngIf="!!session"
+            >
+                <mat-icon>list</mat-icon>
+            </button>
+        </div>
+
+        <mat-form-field class="input-field">
+            <mat-label>Head Coach</mat-label>
+            <input
+                matInput
+                [(ngModel)]="awayModel.coach"
+                (blur)="updateCoach('away')"
+            />
+        </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Assistant Coach 1</mat-label>
+            <input
+                matInput
+                [(ngModel)]="awayModel.assistant1"
+                (blur)="updateAssistant1('away')"
+            />
+        </mat-form-field>
+        <mat-form-field class="input-field">
+            <mat-label>Assistant Coach 2</mat-label>
+            <input
+                matInput
+                [(ngModel)]="awayModel.assistant2"
+                (blur)="updateAssistant2('away')"
+            />
+        </mat-form-field>
+
+        <ag-grid-angular
+            class="ag-theme-alpine"
+            domLayout="autoHeight"
+            [rowData]="awayModel.players"
+            [columnDefs]="colDefs"
+            [gridOptions]="gridOptions"
+            (cellValueChanged)="updatePlayers('away')"
+        >
+        </ag-grid-angular>
     </div>
-    <mat-form-field class="input-field">
-      <mat-label>Head Coach</mat-label>
-      <input
-        matInput
-        [(ngModel)]="awayModel.coach"
-        (blur)="updateCoach('away')"
-      />
-    </mat-form-field>
-    <mat-form-field class="input-field">
-      <mat-label>Assistant Coach 1</mat-label>
-      <input
-        matInput
-        [(ngModel)]="awayModel.assistant1"
-        (blur)="updateAssistant1('away')"
-      />
-    </mat-form-field>
-    <mat-form-field class="input-field">
-      <mat-label>Assistant Coach 2</mat-label>
-      <input
-        matInput
-        [(ngModel)]="awayModel.assistant2"
-        (blur)="updateAssistant2('away')"
-      />
-    </mat-form-field>
-
-    <ag-grid-angular
-      class="ag-theme-alpine"
-      domLayout="autoHeight"
-      [rowData]="awayModel.players"
-      [columnDefs]="colDefs"
-      [gridOptions]="gridOptions"
-      (cellValueChanged)="updatePlayers('away')"
-    >
-    </ag-grid-angular>
-  </div>
 </div>

@@ -1,433 +1,638 @@
 import { Injectable } from '@angular/core';
 import {
-  Action,
-  Selector,
-  State,
-  StateContext,
-  createSelector,
+    Action,
+    Selector,
+    State,
+    StateContext,
+    createSelector,
 } from '@ngxs/store';
+import { Session } from '@supabase/gotrue-js';
 import { Game } from '../actions/game.actions';
 import { Events, Info } from '../actions/info.actions';
 import { Team } from '../actions/team.actions';
 import { SupabaseService } from '../services/supabase.service';
-import { EventsModel, InfoModel, StateModel } from '../utils/models';
+import {
+    EventsModel,
+    InfoModel,
+    Player,
+    StateModel,
+    TeamModel,
+} from '../utils/models';
 import { Utils } from '../utils/utils';
 
 @State<StateModel>({
-  name: 'wolo',
-  defaults: {
-    home: {
-      teamId: crypto.randomUUID(),
-      teamName: '',
-      coach: '',
-      assistant1: '',
-      assistant2: '',
-      players: Utils.emptyTeam(),
-      timeouts: [],
-      capSwaps: [],
-      cards: [],
-    },
-    away: {
-      teamId: crypto.randomUUID(),
-      teamName: '',
-      coach: '',
-      assistant1: '',
-      assistant2: '',
-      players: Utils.emptyTeam(),
-      timeouts: [],
-      capSwaps: [],
-      cards: [],
-    },
-    info: {
-      gameId: crypto.randomUUID(),
-      gameNumber: '',
-      homeScore: 0,
-      awayScore: 0,
-      quarter: 1,
-      location: '',
-      startTime: '',
-      endTime: '',
-      date: new Date(),
-      league: '',
-      category: '',
-      referee1: '',
-      referee2: '',
-      delegate1: '',
-      delegate2: '',
-      events: [],
-    },
-  },
+    name: 'wolo',
+    defaults: Utils.emptyGame(),
 })
 @Injectable()
 export class WoloState {
-  constructor(private supaService: SupabaseService) {}
+    session: Session | null = null;
 
-  @Selector()
-  static selectUser(state: StateModel): string[] {
-    return ['team1', 'team2'];
-  }
-
-  @Selector()
-  static selectInfo(state: StateModel): InfoModel {
-    return state.info;
-  }
-
-  static selectTeam(team: 'home' | 'away') {
-    return createSelector([WoloState], (state: StateModel) => {
-      return team === 'home' ? state.home : state.away;
-    });
-  }
-
-  @Selector()
-  static selectEvents(state: StateModel): EventsModel[] {
-    return state.info.events;
-  }
-
-  @Action(Game.Create)
-  gameCreate(ctx: StateContext<StateModel>): void {
-    // if user is loged in, save the game first
-    const g = Utils.emptyGame();
-    // this.supaService.addTeam({
-    //   team_id: crypto.randomUUID(),
-    //   team_name: '',
-    //   coach: '',
-    //   assistant1: '',
-    //   assistant2: '',
-    //   players: Utils.emptyTeam(),
-    // });
-    ctx.patchState({ ...g });
-  }
-  @Action(Game.GetAll)
-  gameGetAll(ctx: StateContext<StateModel>): void {}
-  @Action(Game.GetOne)
-  gameGetOne(ctx: StateContext<StateModel>, p: Game.GetOne): void {}
-  @Action(Game.Update)
-  gameUpdate(ctx: StateContext<StateModel>): void {}
-  @Action(Game.Delete)
-  gameDelete(ctx: StateContext<StateModel>): void {
-    console.log(ctx.getState());
-  }
-
-  @Action(Team.Create)
-  teamCreate(ctx: StateContext<StateModel>): void {}
-  @Action(Team.GetAll)
-  teamGetAll(ctx: StateContext<StateModel>): void {}
-  @Action(Team.GetOne)
-  teamGetOne(ctx: StateContext<StateModel>, p: Team.GetOne): void {}
-  @Action(Team.Delete)
-  teamDelete(ctx: StateContext<StateModel>): void {}
-
-  @Action(Events.Goal)
-  eventGoal(ctx: StateContext<StateModel>, p: Events.Goal): void {
-    const state = ctx.getState();
-
-    const homeScore =
-      p.color === 'home' ? state.info.homeScore + 1 : state.info.homeScore;
-    const awayScore =
-      p.color === 'away' ? state.info.awayScore + 1 : state.info.awayScore;
-
-    const goalEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: p.number,
-      teamColor: p.color.toUpperCase(),
-      incident: 'GOAL',
-      time: p.time,
-      homeScore: homeScore,
-      awayScore: awayScore,
-    };
-
-    ctx.setState({
-      ...state,
-      info: {
-        ...state.info,
-        homeScore: homeScore,
-        awayScore: awayScore,
-        events: [...state.info.events, goalEvent],
-      },
-    });
-  }
-  @Action(Events.Quarter)
-  eventQuarter(ctx: StateContext<StateModel>): void {
-    // TODO: Cap the quarters at OT, and add check if OT is possible
-    const state = ctx.getState();
-    const quarterEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: 'X',
-      teamColor: 'X',
-      incident: 'X',
-      time: 'X',
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    ctx.setState({
-      ...state,
-      info: {
-        ...state.info,
-        quarter: state.info.quarter + 1,
-        events: [...state.info.events, quarterEvent],
-      },
-    });
-  }
-
-  @Action(Events.Timeout)
-  eventTimeout(ctx: StateContext<StateModel>, p: Events.Timeout): void {
-    const state = ctx.getState();
-
-    const quarterEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: 'X',
-      teamColor: p.color.toUpperCase(),
-      incident: 'TIMEOUT',
-      time: p.time,
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    const homeTimeOuts: string[] = [...state.home.timeouts];
-    const awayTimeOuts: string[] = [...state.away.timeouts];
-    if (p.color === 'home') {
-      homeTimeOuts.push(`Q${state.info.quarter} ${p.time}`);
-    } else {
-      awayTimeOuts.push(`Q${state.info.quarter} ${p.time}`);
+    constructor(private readonly supabase: SupabaseService) {
+        this.supabase.authChanges((_, session) => {
+            this.session = session;
+        });
     }
 
-    ctx.setState({
-      home: { ...state.home, timeouts: homeTimeOuts },
-      away: { ...state.away, timeouts: awayTimeOuts },
-      info: {
-        ...state.info,
-        events: [...state.info.events, quarterEvent],
-      },
-    });
-  }
-  @Action(Events.Card)
-  eventCard(ctx: StateContext<StateModel>, p: Events.Card): void {
-    const state = ctx.getState();
-
-    const cardEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: p.person,
-      teamColor: p.color.toUpperCase(),
-      incident: p.type.toUpperCase() + ' CARD',
-      time: p.time,
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    const homeCards: string[] = [...state.home.cards];
-    const awayCards: string[] = [...state.away.cards];
-    if (p.color === 'home') {
-      homeCards.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
-    } else {
-      awayCards.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
+    @Selector()
+    static gameSaved(state: StateModel): boolean {
+        return state.saved;
     }
 
-    ctx.setState({
-      home: { ...state.home, cards: homeCards },
-      away: { ...state.away, cards: awayCards },
-      info: {
-        ...state.info,
-        events: [...state.info.events, cardEvent],
-      },
-    });
-  }
-  @Action(Events.CapSwap)
-  eventCapSwap(ctx: StateContext<StateModel>, p: Events.CapSwap): void {
-    const state = ctx.getState();
-
-    const capSwapEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: `#${p.number1} & #${p.number2}`,
-      teamColor: p.color.toUpperCase(),
-      incident: 'CAP SWAP',
-      time: p.time,
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    const homeCapSwaps: string[] = [...state.home.capSwaps];
-    const awayCapSwaps: string[] = [...state.away.capSwaps];
-    if (p.color === 'home') {
-      homeCapSwaps.push(
-        `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
-      );
-    } else {
-      awayCapSwaps.push(
-        `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
-      );
+    @Selector()
+    static selectInfo(state: StateModel): InfoModel {
+        return state.info;
     }
 
-    ctx.setState({
-      home: { ...state.home, capSwaps: homeCapSwaps },
-      away: { ...state.away, capSwaps: awayCapSwaps },
-      info: {
-        ...state.info,
-        events: [...state.info.events, capSwapEvent],
-      },
-    });
-  }
-
-  @Action(Events.Exclusion)
-  eventExclusion(ctx: StateContext<StateModel>, p: Events.Exclusion): void {
-    const state = ctx.getState();
-
-    const exclusionEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: p.number,
-      teamColor: p.color.toUpperCase(),
-      incident: 'EXCLUSION',
-      time: p.time,
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    ctx.setState({
-      ...state,
-      info: {
-        ...state.info,
-        events: [...state.info.events, exclusionEvent],
-      },
-    });
-  }
-
-  @Action(Events.Brutality)
-  eventBrutality(ctx: StateContext<StateModel>, p: Events.Brutality): void {
-    // TODO: Add a red card?
-    const state = ctx.getState();
-
-    const brutalityEvent: EventsModel = {
-      eventId: state.info.events.length,
-      number: p.number,
-      teamColor: p.color.toUpperCase(),
-      incident: 'BRUTALITY',
-      time: p.time,
-      homeScore: state.info.homeScore,
-      awayScore: state.info.awayScore,
-    };
-
-    ctx.setState({
-      ...state,
-      info: {
-        ...state.info,
-        events: [...state.info.events, brutalityEvent],
-      },
-    });
-  }
-
-  @Action(Info.UpdateGameNumber)
-  updateGameNumber(
-    ctx: StateContext<StateModel>,
-    { gameNumber }: Info.UpdateGameNumber
-  ): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, gameNumber: gameNumber } });
-  }
-
-  @Action(Info.UpdateLocation)
-  updateLocation(
-    ctx: StateContext<StateModel>,
-    { location }: Info.UpdateLocation
-  ): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, location: location } });
-  }
-
-  @Action(Info.UpdateLeague)
-  updateLeague(
-    ctx: StateContext<StateModel>,
-    { league }: Info.UpdateLeague
-  ): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, league: league } });
-  }
-
-  @Action(Info.UpdateCategory)
-  updateCategory(
-    ctx: StateContext<StateModel>,
-    { category }: Info.UpdateCategory
-  ): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, category: category } });
-  }
-
-  @Action(Info.UpdateDate)
-  updateDate(ctx: StateContext<StateModel>, { date }: Info.UpdateDate): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, date: date } });
-  }
-
-  @Action(Info.UpdateStartTime)
-  updateStartTime(
-    ctx: StateContext<StateModel>,
-    { startTime }: Info.UpdateStartTime
-  ): void {
-    const state = ctx.getState();
-    ctx.setState({ ...state, info: { ...state.info, startTime: startTime } });
-  }
-
-  @Action(Team.UpdateTeamName)
-  updateTeamName(
-    ctx: StateContext<StateModel>,
-    { color, value }: Team.UpdateTeamName
-  ): void {
-    const state = ctx.getState();
-    if (color === 'home') {
-      ctx.setState({ ...state, home: { ...state.home, teamName: value } });
-    } else {
-      ctx.setState({ ...state, away: { ...state.away, teamName: value } });
+    static selectTeam(team: 'home' | 'away') {
+        return createSelector([WoloState], (state: StateModel): TeamModel => {
+            return team === 'home' ? state.home : state.away;
+        });
     }
-  }
 
-  @Action(Team.UpdateCoach)
-  updateCoach(
-    ctx: StateContext<StateModel>,
-    { color, value }: Team.UpdateCoach
-  ): void {
-    const state = ctx.getState();
-    if (color === 'home') {
-      ctx.setState({ ...state, home: { ...state.home, coach: value } });
-    } else {
-      ctx.setState({ ...state, away: { ...state.away, coach: value } });
+    @Selector()
+    static selectEvents(state: StateModel): EventsModel[] {
+        return state.info.events;
     }
-  }
 
-  @Action(Team.UpdateAssistant1)
-  updateAssistant1(
-    ctx: StateContext<StateModel>,
-    { color, value }: Team.UpdateAssistant1
-  ): void {
-    const state = ctx.getState();
-    if (color === 'home') {
-      ctx.setState({ ...state, home: { ...state.home, assistant1: value } });
-    } else {
-      ctx.setState({ ...state, away: { ...state.away, assistant1: value } });
+    // GAME ACTIONS
+    @Action(Game.New)
+    gameCreate(ctx: StateContext<StateModel>): void {
+        ctx.patchState({ ...Utils.emptyGame() });
     }
-  }
 
-  @Action(Team.UpdateAssistant2)
-  updateAssistant2(
-    ctx: StateContext<StateModel>,
-    { color, value }: Team.UpdateAssistant2
-  ): void {
-    const state = ctx.getState();
-    if (color === 'home') {
-      ctx.setState({ ...state, home: { ...state.home, assistant2: value } });
-    } else {
-      ctx.setState({ ...state, away: { ...state.away, assistant2: value } });
+    @Action(Game.Upsert)
+    async gameUpsert(ctx: StateContext<StateModel>): Promise<void> {
+        const state = ctx.getState();
+        if (!this.session) {
+            return;
+        }
+        const { error } = await this.supabase.upsertGame(
+            this.session.user,
+            state
+        );
+        if (error) {
+            return;
+        }
+        ctx.setState({ ...state, saved: true });
     }
-  }
 
-  @Action(Team.UpdatePlayers)
-  updatePlayers(
-    ctx: StateContext<StateModel>,
-    { color, value }: Team.UpdatePlayers
-  ): void {
-    const state = ctx.getState();
-    if (color === 'home') {
-      ctx.setState({ ...state, home: { ...state.home, players: value } });
-    } else {
-      ctx.setState({ ...state, away: { ...state.away, players: value } });
+    @Action(Game.Patch)
+    async gamePatch(
+        ctx: StateContext<StateModel>,
+        { gameModel }: Game.Patch
+    ): Promise<void> {
+        ctx.patchState({ ...gameModel });
     }
-  }
+
+    // EVENTS ACTIONS
+    @Action(Events.Goal)
+    eventGoal(ctx: StateContext<StateModel>, p: Events.Goal): void {
+        const state = ctx.getState();
+        let h, a, players;
+
+        if (p.color === 'home') {
+            h = state.info.homeScore + 1;
+            a = state.info.awayScore;
+            players = state.home.players;
+        } else {
+            h = state.info.homeScore;
+            a = state.info.awayScore + 1;
+            players = state.away.players;
+        }
+
+        const updatedPlayers = players.map((player) => {
+            if (player.number !== p.number) {
+                return player;
+            } else {
+                const p = { ...player };
+                if (state.info.quarter === 1) {
+                    p.q1++;
+                } else if (state.info.quarter === 2) {
+                    p.q2++;
+                } else if (state.info.quarter === 3) {
+                    p.q3++;
+                } else if (state.info.quarter === 4) {
+                    p.q4++;
+                } else if (state.info.quarter === 5) {
+                    p.q5++;
+                }
+                return p;
+            }
+        });
+
+        const goalEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: p.number,
+            teamColor: p.color.toUpperCase(),
+            incident: 'GOAL',
+            time: p.time,
+            homeScore: h,
+            awayScore: a,
+        };
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: {
+                ...state.home,
+                players:
+                    p.color === 'home' ? updatedPlayers : state.home.players,
+            },
+            away: {
+                ...state.away,
+                players:
+                    p.color === 'away' ? updatedPlayers : state.away.players,
+            },
+            info: {
+                ...state.info,
+                homeScore: h,
+                awayScore: a,
+                events: [...state.info.events, goalEvent],
+            },
+        });
+    }
+
+    @Action(Events.Quarter)
+    eventQuarter(ctx: StateContext<StateModel>): void {
+        // TODO: Cap the quarters at OT, and add check if OT is possible
+        const state = ctx.getState();
+        const quarterEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: 'X',
+            teamColor: 'X',
+            incident: 'X',
+            time: 'X',
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: {
+                ...state.info,
+                quarter: state.info.quarter + 1,
+                events: [...state.info.events, quarterEvent],
+            },
+        });
+    }
+
+    @Action(Events.Timeout)
+    eventTimeout(ctx: StateContext<StateModel>, p: Events.Timeout): void {
+        const state = ctx.getState();
+
+        const quarterEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: 'X',
+            teamColor: p.color.toUpperCase(),
+            incident: 'TIMEOUT',
+            time: p.time,
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        const h: string[] = [...state.home.timeouts];
+        const a: string[] = [...state.away.timeouts];
+        if (p.color === 'home') {
+            h.push(`Q${state.info.quarter} ${p.time}`);
+        } else {
+            a.push(`Q${state.info.quarter} ${p.time}`);
+        }
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: { ...state.home, timeouts: h },
+            away: { ...state.away, timeouts: a },
+            info: {
+                ...state.info,
+                events: [...state.info.events, quarterEvent],
+            },
+        });
+    }
+
+    @Action(Events.Card)
+    eventCard(ctx: StateContext<StateModel>, p: Events.Card): void {
+        const state = ctx.getState();
+
+        const cardEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: p.person,
+            teamColor: p.color.toUpperCase(),
+            incident: p.type.toUpperCase() + ' CARD',
+            time: p.time,
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        const h: string[] = [...state.home.cards];
+        const a: string[] = [...state.away.cards];
+        if (p.color === 'home') {
+            h.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
+        } else {
+            a.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
+        }
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: { ...state.home, cards: h },
+            away: { ...state.away, cards: a },
+            info: {
+                ...state.info,
+                events: [...state.info.events, cardEvent],
+            },
+        });
+    }
+
+    @Action(Events.CapSwap)
+    eventCapSwap(ctx: StateContext<StateModel>, p: Events.CapSwap): void {
+        const state = ctx.getState();
+
+        const capSwapEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: `#${p.number1} & #${p.number2}`,
+            teamColor: p.color.toUpperCase(),
+            incident: 'CAP SWAP',
+            time: p.time,
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        const h: string[] = [...state.home.capSwaps];
+        const a: string[] = [...state.away.capSwaps];
+        if (p.color === 'home') {
+            h.push(
+                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
+            );
+        } else {
+            a.push(
+                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
+            );
+        }
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: { ...state.home, capSwaps: h },
+            away: { ...state.away, capSwaps: a },
+            info: {
+                ...state.info,
+                events: [...state.info.events, capSwapEvent],
+            },
+        });
+    }
+
+    @Action(Events.Exclusion)
+    eventExclusion(ctx: StateContext<StateModel>, p: Events.Exclusion): void {
+        const state = ctx.getState();
+        let players: Player[];
+
+        if (p.color === 'home') {
+            players = state.home.players;
+        } else {
+            players = state.away.players;
+        }
+
+        const updatedPlayers = players.map((player) => {
+            if (player.number !== p.number) {
+                return player;
+            } else {
+                const newPlayer = { ...player };
+                if (newPlayer.f1 === '') {
+                    newPlayer.f1 = `Q${state.info.quarter} ${p.time}`;
+                } else if (newPlayer.f2 === '') {
+                    newPlayer.f2 = `Q${state.info.quarter} ${p.time}`;
+                } else if (newPlayer.f3 === '') {
+                    newPlayer.f3 = `Q${state.info.quarter} ${p.time}`;
+                }
+                return newPlayer;
+            }
+        });
+        const exclusionEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: p.number,
+            teamColor: p.color.toUpperCase(),
+            incident: 'EXCLUSION',
+            time: p.time,
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: {
+                ...state.home,
+                players:
+                    p.color === 'home' ? updatedPlayers : state.home.players,
+            },
+            away: {
+                ...state.away,
+                players:
+                    p.color === 'away' ? updatedPlayers : state.away.players,
+            },
+            info: {
+                ...state.info,
+                events: [...state.info.events, exclusionEvent],
+            },
+        });
+    }
+
+    @Action(Events.Brutality)
+    eventBrutality(ctx: StateContext<StateModel>, p: Events.Brutality): void {
+        // TODO: Add a red card?
+        const state = ctx.getState();
+        let players: Player[];
+
+        if (p.color === 'home') {
+            players = state.home.players;
+        } else {
+            players = state.away.players;
+        }
+
+        const updatedPlayers = players.map((player) => {
+            if (player.number !== p.number) {
+                return player;
+            } else {
+                const newPlayer = { ...player };
+                const brutString = `Q${state.info.quarter} ${p.time}`;
+                if (newPlayer.f1 === '') {
+                    newPlayer.f1 = brutString;
+                }
+                if (newPlayer.f2 === '') {
+                    newPlayer.f2 = brutString;
+                }
+                if (newPlayer.f3 === '') {
+                    newPlayer.f3 = brutString;
+                }
+                return newPlayer;
+            }
+        });
+
+        const brutalityEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: p.number,
+            teamColor: p.color.toUpperCase(),
+            incident: 'BRUTALITY',
+            time: p.time,
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            home: {
+                ...state.home,
+                players:
+                    p.color === 'home' ? updatedPlayers : state.home.players,
+            },
+            away: {
+                ...state.away,
+                players:
+                    p.color === 'away' ? updatedPlayers : state.away.players,
+            },
+            info: {
+                ...state.info,
+                events: [...state.info.events, brutalityEvent],
+            },
+        });
+    }
+
+    @Action(Info.UpdateGameNumber)
+    updateGameNumber(
+        ctx: StateContext<StateModel>,
+        { gameNumber }: Info.UpdateGameNumber
+    ): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, gameNumber: gameNumber },
+        });
+    }
+
+    @Action(Info.UpdateLocation)
+    updateLocation(
+        ctx: StateContext<StateModel>,
+        { location }: Info.UpdateLocation
+    ): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, location: location },
+        });
+    }
+
+    @Action(Info.UpdateLeague)
+    updateLeague(
+        ctx: StateContext<StateModel>,
+        { league }: Info.UpdateLeague
+    ): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, league: league },
+        });
+    }
+
+    @Action(Info.UpdateCategory)
+    updateCategory(
+        ctx: StateContext<StateModel>,
+        { category }: Info.UpdateCategory
+    ): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, category: category },
+        });
+    }
+
+    @Action(Info.UpdateDate)
+    updateDate(ctx: StateContext<StateModel>, { date }: Info.UpdateDate): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, date: date },
+        });
+    }
+
+    @Action(Info.UpdateStartTime)
+    updateStartTime(
+        ctx: StateContext<StateModel>,
+        { startTime }: Info.UpdateStartTime
+    ): void {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: { ...state.info, startTime: startTime },
+        });
+    }
+
+    // TEAM ACTIONS
+    @Action(Team.UpdateTeamName)
+    async updateTeamName(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.UpdateTeamName
+    ): Promise<void> {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: { ...state.home, teamName: value, saved: false },
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: { ...state.away, teamName: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.UpdateCoach)
+    async updateCoach(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.UpdateCoach
+    ): Promise<void> {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: { ...state.home, coach: value, saved: false },
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: { ...state.away, coach: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.UpdateAssistant1)
+    async updateAssistant1(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.UpdateAssistant1
+    ): Promise<void> {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: { ...state.home, assistant1: value, saved: false },
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: { ...state.away, assistant1: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.UpdateAssistant2)
+    async updateAssistant2(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.UpdateAssistant2
+    ): Promise<void> {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: { ...state.home, assistant2: value, saved: false },
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: { ...state.away, assistant2: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.UpdatePlayers)
+    async updatePlayers(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.UpdatePlayers
+    ): Promise<void> {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: { ...state.home, players: value, saved: false },
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: { ...state.away, players: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.Save)
+    async teamSave(
+        ctx: StateContext<StateModel>,
+        { color }: Team.Save
+    ): Promise<void> {
+        const state = ctx.getState();
+
+        if (!this.session) {
+            return;
+        }
+        if (color === 'home') {
+            const { error } = await this.supabase.upsertTeam(
+                this.session.user,
+                state.home
+            );
+            if (error) {
+                return;
+            }
+            ctx.setState({ ...state, home: { ...state.home, saved: true } });
+        } else {
+            const { error } = await this.supabase.upsertTeam(
+                this.session.user,
+                state.away
+            );
+            if (error) {
+                return;
+            }
+            ctx.setState({ ...state, away: { ...state.away, saved: true } });
+        }
+    }
+
+    @Action(Team.Patch)
+    async teamPatch(
+        ctx: StateContext<StateModel>,
+        { color, value }: Team.Patch
+    ): Promise<void> {
+        const teamModel: TeamModel = {
+            ...value,
+            players: [
+                ...value.players.map((p) => Utils.newPlayer(p.name, p.number)),
+            ],
+            timeouts: [],
+            capSwaps: [],
+            cards: [],
+            saved: true,
+        };
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({ ...state, home: teamModel });
+        } else {
+            ctx.setState({ ...state, away: teamModel });
+        }
+    }
 }

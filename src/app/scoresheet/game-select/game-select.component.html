@@ -1,0 +1,10 @@
+<mat-card *ngFor="let item of data" (click)="selectGame(item)">
+    <mat-card-header>
+        {{ item.home.teamName || "Home" }} vs {{ item.away.teamName || "Away" }}
+        &nbsp;
+        <b>({{ item.info.homeScore }}-{{ item.info.awayScore }})</b>
+    </mat-card-header>
+    <mat-card-content>
+        Game Date: {{ item.info.date | date : "medium" }}
+    </mat-card-content>
+</mat-card>
