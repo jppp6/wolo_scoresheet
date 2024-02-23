@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { Observable, map, startWith } from 'rxjs';
 import { Events } from 'src/app/core/actions/info.actions';
-import { HelpComponent } from '../help/help.component';
+import { WoloState } from 'src/app/core/states/state';
+import { HelpDialog } from '../help/help.component';
 
 @Component({
     selector: 'app-command',
@@ -12,6 +13,8 @@ import { HelpComponent } from '../help/help.component';
     styleUrls: [],
 })
 export class CommandComponent {
+    @Select(WoloState.gameScore) $gameScore!: Observable<string>;
+
     command = new FormControl('');
     options: Observable<string[]> = new Observable();
 
@@ -214,8 +217,8 @@ export class CommandComponent {
     }
 
     openHelpPage(): void {
-        this.dialog.open(HelpComponent, {
-            width: '750px',
+        this.dialog.open(HelpDialog, {
+            width: '600px',
         });
     }
 }

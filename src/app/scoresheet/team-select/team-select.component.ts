@@ -9,10 +9,10 @@ import { StoredTeamModel } from 'src/app/core/utils/models';
     templateUrl: './team-select.component.html',
     styleUrls: [],
 })
-export class TeamSelectComponent {
+export class TeamSelectDialog {
     constructor(
         private store: Store,
-        public dialogRef: MatDialogRef<TeamSelectComponent>,
+        public dialogRef: MatDialogRef<TeamSelectDialog>,
         @Inject(MAT_DIALOG_DATA)
         public data: { options: StoredTeamModel[]; team: 'home' | 'away' }
     ) {}

@@ -10,7 +10,7 @@ import { SupabaseService } from 'src/app/core/services/supabase.service';
 import { WoloState } from 'src/app/core/states/state';
 import { StoredTeamModel, TeamModel } from 'src/app/core/utils/models';
 import { Utils } from 'src/app/core/utils/utils';
-import { TeamSelectComponent } from '../team-select/team-select.component';
+import { TeamSelectDialog } from '../team-select/team-select.component';
 
 @Component({
     selector: 'app-team',
@@ -60,9 +60,8 @@ export class TeamComponent implements OnInit {
     async openTeamSelect(t: 'home' | 'away'): Promise<void> {
         await this.getTeams();
 
-        this.dialog.open(TeamSelectComponent, {
-            width: '500px',
-            height: '750px',
+        this.dialog.open(TeamSelectDialog, {
+            width: '600px',
             data: {
                 team: t,
                 options: this.storedTeamModels,

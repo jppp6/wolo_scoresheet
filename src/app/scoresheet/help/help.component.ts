@@ -5,4 +5,4 @@ import { Component } from '@angular/core';
     templateUrl: './help.component.html',
     styleUrls: [],
 })
-export class HelpComponent {}
+export class HelpDialog {}

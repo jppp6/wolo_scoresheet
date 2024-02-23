@@ -8,11 +8,11 @@ import { SupabaseService } from '../services/supabase.service';
     templateUrl: './auth.component.html',
     styleUrls: [],
 })
-export class AuthComponent {
+export class AuthDialog {
     signInEmail = new FormControl<string>('', [Validators.email]);
 
     constructor(
-        private readonly dialogRef: MatDialogRef<AuthComponent>,
+        private readonly dialogRef: MatDialogRef<AuthDialog>,
         private readonly supabase: SupabaseService
     ) {}
 

@@ -1,5 +1,10 @@
 <mat-card class="flex-center" style="background-color: #e8ecf1">
-    <mat-form-field>
+    <div style="font-size: 40px" *ngIf="$gameScore | async as gameScore">
+        {{ gameScore }}
+    </div>
+    <br />
+
+    <mat-form-field appearance="outline">
         <mat-label>Command Input</mat-label>
         <input
             matInput

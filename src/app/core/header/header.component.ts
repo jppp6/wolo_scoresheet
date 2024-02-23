@@ -3,10 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { Select, Store } from '@ngxs/store';
 import { Session } from '@supabase/gotrue-js';
 import { Observable } from 'rxjs';
-import { AuthComponent } from 'src/app/core/auth/auth.component';
+import { AuthDialog } from 'src/app/core/auth/auth.component';
 import { SupabaseService } from 'src/app/core/services/supabase.service';
-import { GameSelectComponent } from 'src/app/scoresheet/game-select/game-select.component';
-import { HelpComponent } from 'src/app/scoresheet/help/help.component';
+import { GameSelectDialog } from 'src/app/scoresheet/game-select/game-select.component';
+import { HelpDialog } from 'src/app/scoresheet/help/help.component';
 import { Game } from '../actions/game.actions';
 import { WoloState } from '../states/state';
 
@@ -31,13 +31,13 @@ export class HeaderComponent implements OnInit {
 
     // General users
     openHelpPage(): void {
-        this.dialog.open(HelpComponent, {
+        this.dialog.open(HelpDialog, {
             width: '600px',
         });
     }
 
     signIn(): void {
-        this.dialog.open(AuthComponent, {
+        this.dialog.open(AuthDialog, {
             width: '600px',
         });
     }
@@ -52,7 +52,7 @@ export class HeaderComponent implements OnInit {
             return;
         }
         const games = await this.supabase.getGames();
-        this.dialog.open(GameSelectComponent, {
+        this.dialog.open(GameSelectDialog, {
             width: '600px',
             data: games,
         });

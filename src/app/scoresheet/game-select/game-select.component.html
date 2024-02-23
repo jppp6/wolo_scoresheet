@@ -1,16 +1,24 @@
-<mat-card *ngFor="let item of data" (click)="selectGame(item)">
-    <mat-card-header>
-        {{ item.home.teamName || "Home" }} vs {{ item.away.teamName || "Away" }}
-        &nbsp;
-        <b>({{ item.info.homeScore }}-{{ item.info.awayScore }})</b>
-    </mat-card-header>
-    <mat-card-content>
-        Game Date: {{ item.info.date | date : "medium" }}
-    </mat-card-content>
-</mat-card>
+<h2 mat-dialog-title>Wolo Gamesheet Game Selector</h2>
+<mat-dialog-content>
+    <mat-card
+        style="background-color: #e8ecf1"
+        *ngFor="let item of data"
+        (click)="selectGame(item)"
+    >
+        <mat-card-header>
+            {{ item.home.teamName || "Home" }} vs
+            {{ item.away.teamName || "Away" }}
+            &nbsp;
+            <b>({{ item.info.homeScore }}-{{ item.info.awayScore }})</b>
+        </mat-card-header>
+        <mat-card-content>
+            Game Date: {{ item.info.date | date : "medium" }}
+        </mat-card-content>
+    </mat-card>
 
-<mat-card *ngIf="data.length === 0">
-    <mat-card-header>
-        It seems that you have no games saved...
-    </mat-card-header>
-</mat-card>
+    <mat-card *ngIf="data.length === 0">
+        <mat-card-header>
+            It seems that you have no games saved...
+        </mat-card-header>
+    </mat-card>
+</mat-dialog-content>

@@ -55,6 +55,15 @@ export class WoloState {
         return state.info.events;
     }
 
+    @Selector()
+    static gameScore(state: StateModel): string {
+        if (state.info.quarter === 5) {
+            return `OT: ${state.info.homeScore}-${state.info.awayScore}`;
+        } else {
+            return `Q${state.info.quarter}: ${state.info.homeScore}-${state.info.awayScore}`;
+        }
+    }
+
     // GAME ACTIONS
     @Action(Game.New)
     gameCreate(ctx: StateContext<StateModel>): void {
@@ -168,27 +177,36 @@ export class WoloState {
 
     @Action(Events.Quarter)
     eventQuarter(ctx: StateContext<StateModel>): void {
-        // TODO: Cap the quarters at OT, and add check if OT is possible
         const state = ctx.getState();
-        const quarterEvent: EventsModel = {
-            eventId: state.info.events.length,
-            number: 'X',
-            teamColor: 'X',
-            incident: 'X',
-            time: 'X',
-            homeScore: state.info.homeScore,
-            awayScore: state.info.awayScore,
-        };
+        const q = state.info.quarter + 1;
 
-        ctx.setState({
-            ...state,
-            saved: false,
-            info: {
-                ...state.info,
-                quarter: state.info.quarter + 1,
-                events: [...state.info.events, quarterEvent],
-            },
-        });
+        if (q === 5 && state.info.homeScore !== state.info.awayScore) {
+            alert('OT is not possible, the score is not tied.');
+            return;
+        } else if (q === 6) {
+            alert('You cannot go past OT');
+            return;
+        } else {
+            const quarterEvent: EventsModel = {
+                eventId: state.info.events.length,
+                number: 'X',
+                teamColor: 'X',
+                incident: 'X',
+                time: 'X',
+                homeScore: state.info.homeScore,
+                awayScore: state.info.awayScore,
+            };
+
+            ctx.setState({
+                ...state,
+                saved: false,
+                info: {
+                    ...state.info,
+                    quarter: state.info.quarter + 1,
+                    events: [...state.info.events, quarterEvent],
+                },
+            });
+        }
     }
 
     @Action(Events.Timeout)
