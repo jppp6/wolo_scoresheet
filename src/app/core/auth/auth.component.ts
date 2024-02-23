@@ -17,17 +17,17 @@ export class AuthComponent {
     ) {}
 
     async signUp(): Promise<void> {
+        const email = this.signInEmail.value;
+        if (!email || email === '' || this.signInEmail.invalid) {
+            return;
+        }
         try {
-            const email = this.signInEmail.value;
-            if (!email) {
-                return;
-            }
             const { error } = await this.supabase.signIn(email);
             if (error) {
                 throw error;
             } else {
-                alert('Check your email for the login link!');
                 this.dialogRef.close();
+                alert('Check your email for the login link!');
             }
         } catch (error) {
             if (error instanceof Error) {

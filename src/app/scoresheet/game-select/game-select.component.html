@@ -8,3 +8,9 @@
         Game Date: {{ item.info.date | date : "medium" }}
     </mat-card-content>
 </mat-card>
+
+<mat-card *ngIf="data.length === 0">
+    <mat-card-header>
+        It seems that you have no games saved...
+    </mat-card-header>
+</mat-card>

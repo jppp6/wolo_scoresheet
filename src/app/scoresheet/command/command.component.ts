@@ -92,13 +92,13 @@ export class CommandComponent {
                 ) {
                     return [value + 'home', value + 'away'];
                 } else if (
-                    /^(coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
+                    /^([1-9]|1\d|20|coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
                         value
                     )
                 ) {
                     return [value + 'yellow', value + 'red'];
                 } else if (
-                    /^(coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)(y|yellow|r|red)$/.test(
+                    /^([1-9]|1\d|20|coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)(y|yellow|r|red)$/.test(
                         value
                     )
                 ) {

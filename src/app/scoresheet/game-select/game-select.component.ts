@@ -6,7 +6,7 @@ import { StateModel } from 'src/app/core/utils/models';
 @Component({
     selector: 'app-game-select',
     templateUrl: './game-select.component.html',
-    styleUrls: ['./game-select.component.css'],
+    styleUrls: [],
 })
 export class GameSelectComponent {
     constructor(

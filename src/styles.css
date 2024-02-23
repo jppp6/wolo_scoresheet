@@ -39,3 +39,7 @@ body {
 .input-field {
     width: 33%;
 }
+
+.bold {
+    font-weight: bold;
+}

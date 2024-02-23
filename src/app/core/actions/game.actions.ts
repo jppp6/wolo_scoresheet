@@ -5,6 +5,11 @@ export namespace Game {
         static readonly type = '[Game] New';
     }
 
+    export class GetOne {
+        static readonly type = '[Game] Get Game';
+        constructor(public gameId: string) {}
+    }
+
     export class Upsert {
         static readonly type = '[Game] Upsert';
     }

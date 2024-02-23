@@ -1,6 +1,13 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Player, StateModel } from './models';
 
 export class Utils {
+    static isValidUUIDV4(uuid: string): boolean {
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            uuid
+        );
+    }
+
     static snackCaseToCamelCase(input: any): any {
         if (typeof input !== 'object' || input === null) {
             return input; // return as is if not an object
@@ -50,11 +57,11 @@ export class Utils {
 
     static emptyGame(): StateModel {
         return {
-            gameId: crypto.randomUUID(),
+            gameId: uuidv4(),
             lastUpdated: new Date(),
             saved: false,
             home: {
-                teamId: crypto.randomUUID(),
+                teamId: uuidv4(),
                 teamName: '',
                 coach: '',
                 assistant1: '',
@@ -67,7 +74,7 @@ export class Utils {
                 saved: false,
             },
             away: {
-                teamId: crypto.randomUUID(),
+                teamId: uuidv4(),
                 teamName: '',
                 coach: '',
                 assistant1: '',
@@ -80,7 +87,7 @@ export class Utils {
                 saved: false,
             },
             info: {
-                infoId: crypto.randomUUID(),
+                infoId: uuidv4(),
                 gameNumber: '',
                 homeScore: 0,
                 awayScore: 0,

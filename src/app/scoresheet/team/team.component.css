@@ -1,0 +1,13 @@
+.extras-container {
+    display: flex;
+    height: 100px; /* adjust the height as needed */
+    overflow-y: auto;
+}
+
+.column {
+    flex: 1;
+}
+
+.input-field {
+    width: calc(33.333% - 5.3333px);
+}

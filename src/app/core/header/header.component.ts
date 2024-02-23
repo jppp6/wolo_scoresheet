@@ -13,15 +13,15 @@ import { WoloState } from '../states/state';
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
-    styleUrls: [],
+    styleUrls: ['header.component.css'],
 })
 export class HeaderComponent implements OnInit {
     @Select(WoloState.gameSaved) $gameSaved!: Observable<boolean>;
     session: Session | null = null;
 
     constructor(
-        private dialog: MatDialog,
         private store: Store,
+        private dialog: MatDialog,
         private readonly supabase: SupabaseService
     ) {}
 
@@ -43,11 +43,7 @@ export class HeaderComponent implements OnInit {
     }
 
     // Logged in users
-
-    async saveGame(): Promise<void> {
-        if (!this.session) {
-            return;
-        }
+    saveGame(): void {
         this.store.dispatch(new Game.Upsert());
     }
 
@@ -55,17 +51,14 @@ export class HeaderComponent implements OnInit {
         if (!this.session) {
             return;
         }
-        const games = await this.supabase.getGames(this.session.user);
+        const games = await this.supabase.getGames();
         this.dialog.open(GameSelectComponent, {
             width: '600px',
             data: games,
         });
     }
 
-    async newGame(): Promise<void> {
-        if (!this.session) {
-            return;
-        }
+    newGame(): void {
         this.store.dispatch(new Game.Upsert()).subscribe((_) => {
             this.store.dispatch(new Game.New());
         });

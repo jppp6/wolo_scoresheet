@@ -19,6 +19,8 @@ import { AgGridAngular } from 'ag-grid-angular';
 
 import { environment } from 'src/environments/environment';
 
+import { MatMenuModule } from '@angular/material/menu';
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthComponent } from './core/auth/auth.component';
 import { HeaderComponent } from './core/header/header.component';
@@ -31,7 +33,6 @@ import { InfoComponent } from './scoresheet/info/info.component';
 import { ScoresheetComponent } from './scoresheet/scoresheet.component';
 import { TeamSelectComponent } from './scoresheet/team-select/team-select.component';
 import { TeamComponent } from './scoresheet/team/team.component';
-
 @NgModule({
     declarations: [
         AppComponent,
@@ -63,10 +64,12 @@ import { TeamComponent } from './scoresheet/team/team.component';
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatMenuModule,
         MatNativeDateModule,
         MatToolbarModule,
         MatTooltipModule,
         ReactiveFormsModule,
+        AppRoutingModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

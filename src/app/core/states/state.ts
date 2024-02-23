@@ -61,12 +61,25 @@ export class WoloState {
         ctx.patchState({ ...Utils.emptyGame() });
     }
 
+    @Action(Game.GetOne)
+    async gameGet(
+        ctx: StateContext<StateModel>,
+        { gameId }: Game.GetOne
+    ): Promise<void> {
+        const data = await this.supabase.getGame(gameId);
+        if (data.length !== 1) {
+            return;
+        }
+        const game = Utils.snackCaseToCamelCase(data) as StateModel[];
+        ctx.patchState({ ...game[0] });
+    }
+
     @Action(Game.Upsert)
     async gameUpsert(ctx: StateContext<StateModel>): Promise<void> {
-        const state = ctx.getState();
         if (!this.session) {
             return;
         }
+        const state = ctx.getState();
         const { error } = await this.supabase.upsertGame(
             this.session.user,
             state
@@ -587,11 +600,11 @@ export class WoloState {
         ctx: StateContext<StateModel>,
         { color }: Team.Save
     ): Promise<void> {
-        const state = ctx.getState();
-
         if (!this.session) {
             return;
         }
+
+        const state = ctx.getState();
         if (color === 'home') {
             const { error } = await this.supabase.upsertTeam(
                 this.session.user,

@@ -45,11 +45,24 @@ export class SupabaseService {
             .upsert(game, { onConflict: 'game_id' });
     }
 
-    async getGames(user: User) {
+    async getGame(gameId: string) {
         const { data, error } = await this.supabase
             .from('games')
             .select('game_id, home, away, info, last_updated')
-            .eq('user_id', user.id);
+            .eq('game_id', gameId);
+
+        if (error) {
+            console.error('Error fetching games:', error.message);
+            return [];
+        }
+
+        return data;
+    }
+
+    async getGames() {
+        const { data, error } = await this.supabase
+            .from('games')
+            .select('game_id, home, away, info, last_updated');
 
         if (error) {
             console.error('Error fetching games:', error.message);
@@ -77,13 +90,12 @@ export class SupabaseService {
             .upsert(team, { onConflict: 'team_id' });
     }
 
-    async getTeams(user: User) {
+    async getTeams() {
         const { data, error } = await this.supabase
             .from('teams')
             .select(
                 'team_id, team_name, coach, assistant1, assistant2, players, last_updated'
-            )
-            .eq('user_id', user.id);
+            );
 
         if (error) {
             console.error('Error fetching teams:', error.message);

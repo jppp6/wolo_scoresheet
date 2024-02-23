@@ -45,12 +45,9 @@ export class TeamComponent implements OnInit {
     }
 
     async getTeams() {
-        if (!this.session) {
-            return;
-        }
-        const d = await this.supabase.getTeams(this.session.user);
+        const teams = await this.supabase.getTeams();
         this.storedTeamModels = Utils.snackCaseToCamelCase(
-            d
+            teams
         ) as StoredTeamModel[];
     }
 

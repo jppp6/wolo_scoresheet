@@ -7,7 +7,7 @@ import { StoredTeamModel } from 'src/app/core/utils/models';
 @Component({
     selector: 'app-team-select',
     templateUrl: './team-select.component.html',
-    styleUrls: ['./team-select.component.css'],
+    styleUrls: [],
 })
 export class TeamSelectComponent {
     constructor(
