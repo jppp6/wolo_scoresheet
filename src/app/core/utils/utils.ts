@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Player, StateModel } from './models';
+import { Player, StateModel, TeamModel } from './models';
 
 export class Utils {
     static isValidUUIDV4(uuid: string): boolean {
@@ -47,12 +47,27 @@ export class Utils {
         } as Player;
     }
 
-    static emptyTeam(): Player[] {
+    static emptyPlayers(): Player[] {
         const team: Player[] = [];
         for (let i = 1; i <= 20; i++) {
             team.push(this.newPlayer('', i.toString()));
         }
         return team;
+    }
+    static emptyTeam(): TeamModel {
+        return {
+            teamId: uuidv4(),
+            teamName: '',
+            coach: '',
+            assistant1: '',
+            assistant2: '',
+            players: Utils.emptyPlayers(),
+            timeouts: [],
+            capSwaps: [],
+            cards: [],
+            lastUpdated: new Date(),
+            saved: false,
+        };
     }
 
     static emptyGame(): StateModel {
@@ -60,32 +75,8 @@ export class Utils {
             gameId: uuidv4(),
             lastUpdated: new Date(),
             saved: false,
-            home: {
-                teamId: uuidv4(),
-                teamName: '',
-                coach: '',
-                assistant1: '',
-                assistant2: '',
-                players: Utils.emptyTeam(),
-                timeouts: [],
-                capSwaps: [],
-                cards: [],
-                lastUpdated: new Date(),
-                saved: false,
-            },
-            away: {
-                teamId: uuidv4(),
-                teamName: '',
-                coach: '',
-                assistant1: '',
-                assistant2: '',
-                players: Utils.emptyTeam(),
-                timeouts: [],
-                capSwaps: [],
-                cards: [],
-                lastUpdated: new Date(),
-                saved: false,
-            },
+            home: Utils.emptyTeam(),
+            away: Utils.emptyTeam(),
             info: {
                 infoId: uuidv4(),
                 gameNumber: '',

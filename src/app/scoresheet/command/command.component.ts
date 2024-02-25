@@ -41,10 +41,10 @@ export class CommandComponent {
                 if (!value) {
                     return [
                         '(?cap?)',
-                        'quarter',
                         'coach',
                         'assistant1',
                         'assistant2',
+                        'quarter',
                     ];
                 }
                 value = value.toLowerCase();

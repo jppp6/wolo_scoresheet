@@ -1,0 +1,6 @@
+.ag-theme-alpine {
+    --ag-border-radius: 25px;
+}
+.ag-header-cell:first-child {
+    padding-left: 20px !important;
+}

@@ -111,16 +111,19 @@ export class WoloState {
     @Action(Events.Goal)
     eventGoal(ctx: StateContext<StateModel>, p: Events.Goal): void {
         const state = ctx.getState();
-        let h, a, players;
+
+        let h: number, a: number, players: Player[], teamName: string;
 
         if (p.color === 'home') {
             h = state.info.homeScore + 1;
             a = state.info.awayScore;
             players = state.home.players;
+            teamName = state.home.teamName || 'HOME';
         } else {
             h = state.info.homeScore;
             a = state.info.awayScore + 1;
             players = state.away.players;
+            teamName = state.away.teamName || 'AWAY';
         }
 
         const updatedPlayers = players.map((player) => {
@@ -138,7 +141,10 @@ export class WoloState {
                     p.q4++;
                 } else if (state.info.quarter === 5) {
                     p.q5++;
+                } else {
+                    return p;
                 }
+                p.total++;
                 return p;
             }
         });
@@ -146,7 +152,7 @@ export class WoloState {
         const goalEvent: EventsModel = {
             eventId: state.info.events.length,
             number: p.number,
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: 'GOAL',
             time: p.time,
             homeScore: h,
@@ -178,58 +184,62 @@ export class WoloState {
     @Action(Events.Quarter)
     eventQuarter(ctx: StateContext<StateModel>): void {
         const state = ctx.getState();
+
         const q = state.info.quarter + 1;
 
         if (q === 5 && state.info.homeScore !== state.info.awayScore) {
             alert('OT is not possible, the score is not tied.');
             return;
         } else if (q === 6) {
-            alert('You cannot go past OT');
+            alert('You cannot go passed OT');
             return;
-        } else {
-            const quarterEvent: EventsModel = {
-                eventId: state.info.events.length,
-                number: 'X',
-                teamColor: 'X',
-                incident: 'X',
-                time: 'X',
-                homeScore: state.info.homeScore,
-                awayScore: state.info.awayScore,
-            };
-
-            ctx.setState({
-                ...state,
-                saved: false,
-                info: {
-                    ...state.info,
-                    quarter: state.info.quarter + 1,
-                    events: [...state.info.events, quarterEvent],
-                },
-            });
         }
+        const quarterEvent: EventsModel = {
+            eventId: state.info.events.length,
+            number: 'X',
+            team: 'X',
+            incident: 'X',
+            time: 'X',
+            homeScore: state.info.homeScore,
+            awayScore: state.info.awayScore,
+        };
+
+        ctx.setState({
+            ...state,
+            saved: false,
+            info: {
+                ...state.info,
+                quarter: state.info.quarter + 1,
+                events: [...state.info.events, quarterEvent],
+            },
+        });
     }
 
     @Action(Events.Timeout)
     eventTimeout(ctx: StateContext<StateModel>, p: Events.Timeout): void {
         const state = ctx.getState();
 
+        const h: string[] = [...state.home.timeouts];
+        const a: string[] = [...state.away.timeouts];
+        let teamName: string;
+
+        if (p.color === 'home') {
+            h.push(`Q${state.info.quarter} ${p.time}`);
+            teamName = state.home.teamName || 'HOME';
+        } else {
+            a.push(`Q${state.info.quarter} ${p.time}`);
+            teamName = state.away.teamName || 'AWAY';
+        }
+
         const quarterEvent: EventsModel = {
             eventId: state.info.events.length,
             number: 'X',
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: 'TIMEOUT',
             time: p.time,
             homeScore: state.info.homeScore,
             awayScore: state.info.awayScore,
         };
-
-        const h: string[] = [...state.home.timeouts];
-        const a: string[] = [...state.away.timeouts];
-        if (p.color === 'home') {
-            h.push(`Q${state.info.quarter} ${p.time}`);
-        } else {
-            a.push(`Q${state.info.quarter} ${p.time}`);
-        }
 
         ctx.setState({
             ...state,
@@ -247,23 +257,35 @@ export class WoloState {
     eventCard(ctx: StateContext<StateModel>, p: Events.Card): void {
         const state = ctx.getState();
 
+        const h: string[] = [...state.home.cards];
+        const a: string[] = [...state.away.cards];
+        let teamName: string;
+
+        if (p.color === 'home') {
+            h.push(
+                `${p.person} - Q${
+                    state.info.quarter
+                } ${p.type.toUpperCase()} CARD`
+            );
+            teamName = state.home.teamName || 'HOME';
+        } else {
+            a.push(
+                `${p.person} - Q${state.info.quarter} ${
+                    p.time
+                } ${p.type.toUpperCase()} CARD`
+            );
+            teamName = state.away.teamName || 'AWAY';
+        }
+
         const cardEvent: EventsModel = {
             eventId: state.info.events.length,
             number: p.person,
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: p.type.toUpperCase() + ' CARD',
             time: p.time,
             homeScore: state.info.homeScore,
             awayScore: state.info.awayScore,
         };
-
-        const h: string[] = [...state.home.cards];
-        const a: string[] = [...state.away.cards];
-        if (p.color === 'home') {
-            h.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
-        } else {
-            a.push(`Q${state.info.quarter} ${p.time}: ${p.type}`);
-        }
 
         ctx.setState({
             ...state,
@@ -281,27 +303,31 @@ export class WoloState {
     eventCapSwap(ctx: StateContext<StateModel>, p: Events.CapSwap): void {
         const state = ctx.getState();
 
+        const h: string[] = [...state.home.capSwaps];
+        const a: string[] = [...state.away.capSwaps];
+        let teamName: string;
+
+        if (p.color === 'home') {
+            h.push(
+                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
+            );
+            teamName = state.home.teamName || 'HOME';
+        } else {
+            a.push(
+                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
+            );
+            teamName = state.away.teamName || 'AWAY';
+        }
+
         const capSwapEvent: EventsModel = {
             eventId: state.info.events.length,
             number: `#${p.number1} & #${p.number2}`,
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: 'CAP SWAP',
             time: p.time,
             homeScore: state.info.homeScore,
             awayScore: state.info.awayScore,
         };
-
-        const h: string[] = [...state.home.capSwaps];
-        const a: string[] = [...state.away.capSwaps];
-        if (p.color === 'home') {
-            h.push(
-                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
-            );
-        } else {
-            a.push(
-                `Q${state.info.quarter} ${p.time}: #${p.number1} & #${p.number2}`
-            );
-        }
 
         ctx.setState({
             ...state,
@@ -318,12 +344,15 @@ export class WoloState {
     @Action(Events.Exclusion)
     eventExclusion(ctx: StateContext<StateModel>, p: Events.Exclusion): void {
         const state = ctx.getState();
-        let players: Player[];
+
+        let players: Player[], teamName: string;
 
         if (p.color === 'home') {
             players = state.home.players;
+            teamName = state.home.teamName || 'HOME';
         } else {
             players = state.away.players;
+            teamName = state.away.teamName || 'AWAY';
         }
 
         const updatedPlayers = players.map((player) => {
@@ -341,10 +370,11 @@ export class WoloState {
                 return newPlayer;
             }
         });
+
         const exclusionEvent: EventsModel = {
             eventId: state.info.events.length,
             number: p.number,
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: 'EXCLUSION',
             time: p.time,
             homeScore: state.info.homeScore,
@@ -375,12 +405,15 @@ export class WoloState {
     eventBrutality(ctx: StateContext<StateModel>, p: Events.Brutality): void {
         // TODO: Add a red card?
         const state = ctx.getState();
-        let players: Player[];
+
+        let players: Player[], teamName: string;
 
         if (p.color === 'home') {
             players = state.home.players;
+            teamName = state.home.teamName || 'HOME';
         } else {
             players = state.away.players;
+            teamName = state.away.teamName || 'AWAY';
         }
 
         const updatedPlayers = players.map((player) => {
@@ -405,7 +438,7 @@ export class WoloState {
         const brutalityEvent: EventsModel = {
             eventId: state.info.events.length,
             number: p.number,
-            teamColor: p.color.toUpperCase(),
+            team: teamName.toUpperCase(),
             incident: 'BRUTALITY',
             time: p.time,
             homeScore: state.info.homeScore,
@@ -609,6 +642,24 @@ export class WoloState {
                 ...state,
                 saved: false,
                 away: { ...state.away, players: value, saved: false },
+            });
+        }
+    }
+
+    @Action(Team.New)
+    teamNew(ctx: StateContext<StateModel>, { color }: Team.New): void {
+        const state = ctx.getState();
+        if (color === 'home') {
+            ctx.setState({
+                ...state,
+                saved: false,
+                home: Utils.emptyTeam(),
+            });
+        } else {
+            ctx.setState({
+                ...state,
+                saved: false,
+                away: Utils.emptyTeam(),
             });
         }
     }

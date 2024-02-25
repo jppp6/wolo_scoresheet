@@ -69,6 +69,10 @@ export class TeamComponent implements OnInit {
         });
     }
 
+    newTeam(t: 'home' | 'away'): void {
+        this.store.dispatch(new Team.New(t));
+    }
+
     updateTeamName(t: 'home' | 'away'): void {
         this.store.dispatch(
             new Team.UpdateTeamName(
@@ -191,6 +195,7 @@ export class TeamComponent implements OnInit {
                     field: 'total',
                     headerName: 'Total',
                     width: 40,
+                    valueFormatter: (v) => (!v.value ? '' : v.value.toString()),
                     cellStyle: { 'text-align': 'right' },
                 },
             ],

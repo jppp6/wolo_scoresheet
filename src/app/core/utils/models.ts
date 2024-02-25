@@ -53,7 +53,7 @@ export interface InfoModel {
 export interface EventsModel {
     eventId: number;
     number: string;
-    teamColor: string;
+    team: string;
     incident: string;
     time: string;
     homeScore: number;

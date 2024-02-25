@@ -14,7 +14,7 @@ export class EventsComponent {
     @Select(WoloState.selectEvents) events$!: Observable<EventsModel[]>;
 
     gridOptions: GridOptions = {
-        headerHeight: 24,
+        headerHeight: 40,
         rowHeight: 24,
         defaultColDef: {
             flex: 1,
@@ -27,7 +27,7 @@ export class EventsComponent {
 
     colDefs: ColDef[] = [
         { field: 'number', headerName: '#' },
-        { field: 'teamColor', headerName: 'Color' },
+        { field: 'team', headerName: 'Team' },
         { field: 'incident', headerName: 'Incident' },
         { field: 'time', headerName: 'Time' },
         { field: 'homeScore', headerName: 'Home' },

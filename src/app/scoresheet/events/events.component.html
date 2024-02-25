@@ -1,9 +1,10 @@
 <ag-grid-angular
     *ngIf="events$ | async as events"
     class="ag-theme-alpine w100 h100"
+    style="border-radius: 25px"
     [rowData]="events"
     [gridOptions]="gridOptions"
     [columnDefs]="colDefs"
-    overlayNoRowsTemplate=""
+    [overlayNoRowsTemplate]="'No events to display'"
 >
 </ag-grid-angular>

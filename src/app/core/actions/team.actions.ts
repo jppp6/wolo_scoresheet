@@ -1,6 +1,11 @@
 import { Player, StoredTeamModel } from '../utils/models';
 
 export namespace Team {
+    export class New {
+        static readonly type = '[Team] New';
+        constructor(public color: 'home' | 'away') {}
+    }
+
     export class Save {
         static readonly type = '[Team] Save';
         constructor(public color: 'home' | 'away') {}

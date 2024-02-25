@@ -1,7 +1,11 @@
 <div class="flex-box">
-    <div class="flex w100" *ngIf="homeModel" style="background-color: #d8e1d5">
+    <div
+        class="flex"
+        *ngIf="homeModel"
+        style="background-color: #d8e1d5; border-radius: 25px"
+    >
         <div style="padding: 16px 0px 16px 16px">
-            <div class="flex-box">
+            <div class="flex-box" style="padding-bottom: 4px">
                 <mat-form-field class="input-field" subscriptSizing="dynamic">
                     <mat-label>Home/Light Team</mat-label>
                     <input
@@ -11,39 +15,52 @@
                     />
                 </mat-form-field>
 
-                <span style="flex: 1 1 auto"></span>
+                <span class="flex"></span>
 
                 <button
                     mat-icon-button
-                    matTooltip="Save team to your account"
-                    (click)="upsertTeam('home')"
-                    *ngIf="!!session && !checkIfExists(homeModel)"
-                >
-                    <mat-icon>add</mat-icon>
-                </button>
-                <button
-                    mat-icon-button
-                    matTooltip="Update team"
-                    (click)="upsertTeam('home')"
-                    *ngIf="
-                        !!session &&
-                        checkIfExists(homeModel) &&
-                        !homeModel.saved
-                    "
-                >
-                    <mat-icon>cloud_upload</mat-icon>
-                </button>
-                <button
-                    mat-icon-button
-                    matTooltip="Open game selector"
-                    (click)="openTeamSelect('home')"
+                    matTooltip="Open team options"
+                    [matMenuTriggerFor]="homeMenu"
                     *ngIf="!!session"
                 >
-                    <mat-icon>list</mat-icon>
+                    <mat-icon>more_vert</mat-icon>
                 </button>
+                <mat-menu #homeMenu="matMenu" xPosition="before">
+                    <button
+                        mat-menu-item
+                        (click)="upsertTeam('home')"
+                        *ngIf="!checkIfExists(homeModel)"
+                    >
+                        <mat-icon>add</mat-icon>
+                        Save Team
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="upsertTeam('home')"
+                        *ngIf="checkIfExists(homeModel) && !homeModel.saved"
+                    >
+                        <mat-icon>cloud_upload</mat-icon>
+                        Update Team
+                    </button>
+
+                    <button mat-menu-item (click)="openTeamSelect('home')">
+                        <mat-icon>list</mat-icon>
+                        Select Team
+                    </button>
+
+                    <button mat-menu-item (click)="newTeam('home')">
+                        <mat-icon>restart_alt</mat-icon>
+                        New Team
+                    </button>
+                </mat-menu>
             </div>
 
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
+            <mat-form-field
+                class="input-field"
+                style="padding-right: 4px"
+                subscriptSizing="dynamic"
+            >
                 <mat-label>Head Coach</mat-label>
                 <input
                     matInput
@@ -51,7 +68,12 @@
                     (blur)="updateCoach('home')"
                 />
             </mat-form-field>
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
+
+            <mat-form-field
+                class="input-field"
+                style="padding-right: 4px"
+                subscriptSizing="dynamic"
+            >
                 <mat-label>Assistant Coach 1</mat-label>
                 <input
                     matInput
@@ -59,6 +81,7 @@
                     (blur)="updateAssistant1('home')"
                 />
             </mat-form-field>
+
             <mat-form-field class="input-field" subscriptSizing="dynamic">
                 <mat-label>Assistant Coach 2</mat-label>
                 <input
@@ -101,9 +124,13 @@
         </div>
     </div>
 
-    <div class="flex w100" style="background-color: #939f96" *ngIf="awayModel">
+    <div
+        class="flex"
+        style="background-color: #939f96; border-radius: 25px"
+        *ngIf="awayModel"
+    >
         <div style="padding: 16px 0px 16px 16px">
-            <div class="flex-box">
+            <div class="flex-box" style="padding-bottom: 4px">
                 <mat-form-field class="input-field" subscriptSizing="dynamic">
                     <mat-label>Away/Dark Team</mat-label>
                     <input
@@ -113,39 +140,52 @@
                     />
                 </mat-form-field>
 
-                <span style="flex: 1 1 auto"></span>
+                <span class="flex"></span>
 
                 <button
                     mat-icon-button
-                    matTooltip="Save team to your account"
-                    (click)="upsertTeam('away')"
-                    *ngIf="!!session && !checkIfExists(awayModel)"
-                >
-                    <mat-icon>add</mat-icon>
-                </button>
-                <button
-                    mat-icon-button
-                    matTooltip="Update team"
-                    (click)="upsertTeam('away')"
-                    *ngIf="
-                        !!session &&
-                        checkIfExists(awayModel) &&
-                        !awayModel.saved
-                    "
-                >
-                    <mat-icon>cloud_upload</mat-icon>
-                </button>
-                <button
-                    mat-icon-button
-                    matTooltip="Open game selector"
-                    (click)="openTeamSelect('away')"
+                    matTooltip="Open team options"
+                    [matMenuTriggerFor]="awayMenu"
                     *ngIf="!!session"
                 >
-                    <mat-icon>list</mat-icon>
+                    <mat-icon>more_vert</mat-icon>
                 </button>
+                <mat-menu #awayMenu="matMenu" xPosition="before">
+                    <button
+                        mat-menu-item
+                        (click)="upsertTeam('away')"
+                        *ngIf="!checkIfExists(awayModel)"
+                    >
+                        <mat-icon>add</mat-icon>
+                        Save Team
+                    </button>
+
+                    <button
+                        mat-menu-item
+                        (click)="upsertTeam('away')"
+                        *ngIf="checkIfExists(awayModel) && !awayModel.saved"
+                    >
+                        <mat-icon>cloud_upload</mat-icon>
+                        Update Team
+                    </button>
+
+                    <button mat-menu-item (click)="openTeamSelect('away')">
+                        <mat-icon>list</mat-icon>
+                        Select Team
+                    </button>
+
+                    <button mat-menu-item (click)="newTeam('away')">
+                        <mat-icon>restart_alt</mat-icon>
+                        New Team
+                    </button>
+                </mat-menu>
             </div>
 
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
+            <mat-form-field
+                class="input-field"
+                style="padding-right: 4px"
+                subscriptSizing="dynamic"
+            >
                 <mat-label>Head Coach</mat-label>
                 <input
                     matInput
@@ -153,7 +193,11 @@
                     (blur)="updateCoach('away')"
                 />
             </mat-form-field>
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
+            <mat-form-field
+                class="input-field"
+                style="padding-right: 4px"
+                subscriptSizing="dynamic"
+            >
                 <mat-label>Assistant Coach 1</mat-label>
                 <input
                     matInput
