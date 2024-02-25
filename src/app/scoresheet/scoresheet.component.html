@@ -1,6 +1,15 @@
 <div class="layout-container">
     <app-info class="info"></app-info>
     <app-command class="command"></app-command>
-    <app-team class="teams"></app-team>
+    <app-team
+        class="home"
+        [teamColor]="'home'"
+        [teamModel$]="homeModel$"
+    ></app-team>
+    <app-team
+        class="away"
+        [teamColor]="'away'"
+        [teamModel$]="awayModel$"
+    ></app-team>
     <app-events class="events"></app-events>
 </div>

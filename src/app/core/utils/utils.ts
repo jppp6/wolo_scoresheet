@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Player, StateModel, TeamModel } from './models';
+import { InfoModel, Player, StateModel, TeamModel } from './models';
 
 export class Utils {
     static isValidUUIDV4(uuid: string): boolean {
@@ -31,7 +31,7 @@ export class Utils {
         }
     }
 
-    static newPlayer(name: string, number: string): Player {
+    static emptyPlayer(name: string, number: string): Player {
         return {
             number: number,
             name: name,
@@ -50,10 +50,11 @@ export class Utils {
     static emptyPlayers(): Player[] {
         const team: Player[] = [];
         for (let i = 1; i <= 20; i++) {
-            team.push(this.newPlayer('', i.toString()));
+            team.push(this.emptyPlayer('', i.toString()));
         }
         return team;
     }
+
     static emptyTeam(): TeamModel {
         return {
             teamId: uuidv4(),
@@ -70,6 +71,27 @@ export class Utils {
         };
     }
 
+    static emptyInfo(): InfoModel {
+        return {
+            infoId: uuidv4(),
+            gameNumber: '',
+            homeScore: 0,
+            awayScore: 0,
+            quarter: 1,
+            location: '',
+            startTime: '',
+            endTime: '',
+            date: new Date(),
+            league: '',
+            category: '',
+            referee1: '',
+            referee2: '',
+            delegate1: '',
+            delegate2: '',
+            events: [],
+        };
+    }
+
     static emptyGame(): StateModel {
         return {
             gameId: uuidv4(),
@@ -77,24 +99,7 @@ export class Utils {
             saved: false,
             home: Utils.emptyTeam(),
             away: Utils.emptyTeam(),
-            info: {
-                infoId: uuidv4(),
-                gameNumber: '',
-                homeScore: 0,
-                awayScore: 0,
-                quarter: 1,
-                location: '',
-                startTime: '',
-                endTime: '',
-                date: new Date(),
-                league: '',
-                category: '',
-                referee1: '',
-                referee2: '',
-                delegate1: '',
-                delegate2: '',
-                events: [],
-            },
+            info: Utils.emptyInfo(),
         };
     }
 }

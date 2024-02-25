@@ -703,7 +703,9 @@ export class WoloState {
         const teamModel: TeamModel = {
             ...value,
             players: [
-                ...value.players.map((p) => Utils.newPlayer(p.name, p.number)),
+                ...value.players.map((p) =>
+                    Utils.emptyPlayer(p.name, p.number)
+                ),
             ],
             timeouts: [],
             capSwaps: [],

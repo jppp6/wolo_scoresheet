@@ -6,6 +6,8 @@
         (click)="selectGame(item)"
     >
         <mat-card-header>
+            Game #:
+            {{ item.info.gameNumber || "_ " }}:
             {{ item.home.teamName || "Home" }} vs
             {{ item.away.teamName || "Away" }}
             &nbsp;

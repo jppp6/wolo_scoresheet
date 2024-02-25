@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { Session } from '@supabase/gotrue-js';
 import { ColGroupDef, GridOptions } from 'ag-grid-community';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
 import { Team } from 'src/app/core/actions/team.actions';
 import { SupabaseService } from 'src/app/core/services/supabase.service';
-import { WoloState } from 'src/app/core/states/state';
 import { StoredTeamModel, TeamModel } from 'src/app/core/utils/models';
 import { Utils } from 'src/app/core/utils/utils';
 import { TeamSelectDialog } from '../team-select/team-select.component';
@@ -18,11 +17,10 @@ import { TeamSelectDialog } from '../team-select/team-select.component';
     styleUrls: ['./team.component.css'],
 })
 export class TeamComponent implements OnInit {
-    @Select(WoloState.selectTeam('home')) homeModel$!: Observable<TeamModel>;
-    homeModel!: TeamModel;
-    @Select(WoloState.selectTeam('away')) awayModel$!: Observable<TeamModel>;
-    awayModel!: TeamModel;
+    @Input() teamColor!: 'home' | 'away';
+    @Input() teamModel$!: Observable<TeamModel>;
 
+    teamModel!: TeamModel;
     storedTeamModels: StoredTeamModel[] = [];
     session: Session | null = null;
 
@@ -35,12 +33,8 @@ export class TeamComponent implements OnInit {
     ngOnInit(): void {
         this.supabase.authChanges((_, s) => (this.session = s));
 
-        this.homeModel$.subscribe(
-            (m: TeamModel) => (this.homeModel = cloneDeep(m))
-        );
-
-        this.awayModel$.subscribe(
-            (m: TeamModel) => (this.awayModel = cloneDeep(m))
+        this.teamModel$.subscribe(
+            (m: TeamModel) => (this.teamModel = cloneDeep(m))
         );
     }
 
@@ -51,74 +45,55 @@ export class TeamComponent implements OnInit {
         ) as StoredTeamModel[];
     }
 
-    async upsertTeam(t: 'home' | 'away'): Promise<void> {
-        this.store.dispatch(new Team.Save(t)).subscribe((_) => {
+    async upsertTeam(): Promise<void> {
+        this.store.dispatch(new Team.Save(this.teamColor)).subscribe((_) => {
             this.getTeams();
         });
     }
 
-    async openTeamSelect(t: 'home' | 'away'): Promise<void> {
+    async openTeamSelect(): Promise<void> {
         await this.getTeams();
 
         this.dialog.open(TeamSelectDialog, {
             width: '600px',
             data: {
-                team: t,
+                team: this.teamColor,
                 options: this.storedTeamModels,
             },
         });
     }
 
-    newTeam(t: 'home' | 'away'): void {
-        this.store.dispatch(new Team.New(t));
+    newTeam(): void {
+        this.store.dispatch(new Team.New(this.teamColor));
     }
 
-    updateTeamName(t: 'home' | 'away'): void {
+    updateTeamName(): void {
         this.store.dispatch(
-            new Team.UpdateTeamName(
-                t,
-                t === 'home' ? this.homeModel.teamName : this.awayModel.teamName
-            )
+            new Team.UpdateTeamName(this.teamColor, this.teamModel.teamName)
         );
     }
 
-    updateCoach(t: 'home' | 'away'): void {
+    updateCoach(): void {
         this.store.dispatch(
-            new Team.UpdateCoach(
-                t,
-                t === 'home' ? this.homeModel.coach : this.awayModel.coach
-            )
+            new Team.UpdateCoach(this.teamColor, this.teamModel.coach)
         );
     }
 
-    updateAssistant1(t: 'home' | 'away'): void {
+    updateAssistant1(): void {
         this.store.dispatch(
-            new Team.UpdateAssistant1(
-                t,
-                t === 'home'
-                    ? this.homeModel.assistant1
-                    : this.awayModel.assistant1
-            )
+            new Team.UpdateAssistant1(this.teamColor, this.teamModel.assistant1)
         );
     }
 
-    updateAssistant2(t: 'home' | 'away'): void {
+    updateAssistant2(): void {
         this.store.dispatch(
-            new Team.UpdateAssistant2(
-                t,
-                t === 'home'
-                    ? this.homeModel.assistant2
-                    : this.awayModel.assistant2
-            )
+            new Team.UpdateAssistant2(this.teamColor, this.teamModel.assistant2)
         );
     }
 
-    updatePlayers(t: 'home' | 'away'): void {
+    updatePlayers(): void {
         this.store.dispatch(
-            new Team.UpdatePlayers(
-                t,
-                t === 'home' ? this.homeModel.players : this.awayModel.players
-            )
+            new Team.UpdatePlayers(this.teamColor, this.teamModel.players)
         );
     }
 

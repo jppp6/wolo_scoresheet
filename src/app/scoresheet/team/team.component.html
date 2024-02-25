@@ -1,248 +1,126 @@
-<div class="flex-box">
-    <div
-        class="flex"
-        *ngIf="homeModel"
-        style="background-color: #d8e1d5; border-radius: 25px"
-    >
-        <div style="padding: 16px 0px 16px 16px">
-            <div class="flex-box" style="padding-bottom: 4px">
-                <mat-form-field class="input-field" subscriptSizing="dynamic">
-                    <mat-label>Home/Light Team</mat-label>
-                    <input
-                        matInput
-                        [(ngModel)]="homeModel.teamName"
-                        (blur)="updateTeamName('home')"
-                    />
-                </mat-form-field>
+<div
+    style="border-radius: 25px"
+    [ngStyle]="{
+        'background-color': teamColor === 'home' ? '#d8e1d5' : '#939f96'
+    }"
+>
+    <div style="padding: 16px 0px 16px 16px">
+        <div class="flex-box" style="padding-bottom: 4px">
+            <mat-form-field class="input-field" subscriptSizing="dynamic">
+                <mat-label>{{
+                    teamColor === "home" ? "Home/Light Team" : "Away/Dark Team"
+                }}</mat-label>
+                <input
+                    matInput
+                    [(ngModel)]="teamModel.teamName"
+                    (blur)="updateTeamName()"
+                />
+            </mat-form-field>
 
-                <span class="flex"></span>
+            <span class="flex"></span>
+
+            <button
+                mat-icon-button
+                matTooltip="Open team options"
+                [matMenuTriggerFor]="homeMenu"
+                *ngIf="!!session"
+            >
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #homeMenu="matMenu" xPosition="before">
+                <button
+                    mat-menu-item
+                    (click)="upsertTeam()"
+                    *ngIf="!checkIfExists(teamModel)"
+                >
+                    <mat-icon>add</mat-icon>
+                    Save Team
+                </button>
 
                 <button
-                    mat-icon-button
-                    matTooltip="Open team options"
-                    [matMenuTriggerFor]="homeMenu"
-                    *ngIf="!!session"
+                    mat-menu-item
+                    (click)="upsertTeam()"
+                    *ngIf="checkIfExists(teamModel) && !teamModel.saved"
                 >
-                    <mat-icon>more_vert</mat-icon>
+                    <mat-icon>cloud_upload</mat-icon>
+                    Update Team
                 </button>
-                <mat-menu #homeMenu="matMenu" xPosition="before">
-                    <button
-                        mat-menu-item
-                        (click)="upsertTeam('home')"
-                        *ngIf="!checkIfExists(homeModel)"
-                    >
-                        <mat-icon>add</mat-icon>
-                        Save Team
-                    </button>
 
-                    <button
-                        mat-menu-item
-                        (click)="upsertTeam('home')"
-                        *ngIf="checkIfExists(homeModel) && !homeModel.saved"
-                    >
-                        <mat-icon>cloud_upload</mat-icon>
-                        Update Team
-                    </button>
+                <button mat-menu-item (click)="openTeamSelect()">
+                    <mat-icon>list</mat-icon>
+                    Select Team
+                </button>
 
-                    <button mat-menu-item (click)="openTeamSelect('home')">
-                        <mat-icon>list</mat-icon>
-                        Select Team
-                    </button>
-
-                    <button mat-menu-item (click)="newTeam('home')">
-                        <mat-icon>restart_alt</mat-icon>
-                        New Team
-                    </button>
-                </mat-menu>
-            </div>
-
-            <mat-form-field
-                class="input-field"
-                style="padding-right: 4px"
-                subscriptSizing="dynamic"
-            >
-                <mat-label>Head Coach</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="homeModel.coach"
-                    (blur)="updateCoach('home')"
-                />
-            </mat-form-field>
-
-            <mat-form-field
-                class="input-field"
-                style="padding-right: 4px"
-                subscriptSizing="dynamic"
-            >
-                <mat-label>Assistant Coach 1</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="homeModel.assistant1"
-                    (blur)="updateAssistant1('home')"
-                />
-            </mat-form-field>
-
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
-                <mat-label>Assistant Coach 2</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="homeModel.assistant2"
-                    (blur)="updateAssistant2('home')"
-                />
-            </mat-form-field>
+                <button mat-menu-item (click)="newTeam()">
+                    <mat-icon>restart_alt</mat-icon>
+                    New Team
+                </button>
+            </mat-menu>
         </div>
 
-        <ag-grid-angular
-            class="ag-theme-alpine"
-            domLayout="autoHeight"
-            [rowData]="homeModel.players"
-            [columnDefs]="colDefs"
-            [gridOptions]="gridOptions"
-            (cellValueChanged)="updatePlayers('home')"
+        <mat-form-field
+            class="input-field"
+            style="padding-right: 4px"
+            subscriptSizing="dynamic"
         >
-        </ag-grid-angular>
+            <mat-label>Head Coach</mat-label>
+            <input
+                matInput
+                [(ngModel)]="teamModel.coach"
+                (blur)="updateCoach()"
+            />
+        </mat-form-field>
 
-        <div class="extras-container">
-            <div class="column">
-                <b>Timeouts</b>
-                <div *ngFor="let t of homeModel.timeouts">
-                    {{ t }}
-                </div>
-            </div>
-            <div class="column">
-                <b>Cap Swaps</b>
-                <div *ngFor="let c of homeModel.capSwaps">
-                    {{ c }}
-                </div>
-            </div>
-            <div class="column">
-                <b>Cards</b>
-                <div *ngFor="let c of homeModel.cards">
-                    {{ c }}
-                </div>
-            </div>
-        </div>
+        <mat-form-field
+            class="input-field"
+            style="padding-right: 4px"
+            subscriptSizing="dynamic"
+        >
+            <mat-label>Assistant Coach 1</mat-label>
+            <input
+                matInput
+                [(ngModel)]="teamModel.assistant1"
+                (blur)="updateAssistant1()"
+            />
+        </mat-form-field>
+
+        <mat-form-field class="input-field" subscriptSizing="dynamic">
+            <mat-label>Assistant Coach 2</mat-label>
+            <input
+                matInput
+                [(ngModel)]="teamModel.assistant2"
+                (blur)="updateAssistant2()"
+            />
+        </mat-form-field>
     </div>
 
-    <div
-        class="flex"
-        style="background-color: #939f96; border-radius: 25px"
-        *ngIf="awayModel"
+    <ag-grid-angular
+        class="ag-theme-alpine"
+        domLayout="autoHeight"
+        [rowData]="teamModel.players"
+        [columnDefs]="colDefs"
+        [gridOptions]="gridOptions"
+        (cellValueChanged)="updatePlayers()"
     >
-        <div style="padding: 16px 0px 16px 16px">
-            <div class="flex-box" style="padding-bottom: 4px">
-                <mat-form-field class="input-field" subscriptSizing="dynamic">
-                    <mat-label>Away/Dark Team</mat-label>
-                    <input
-                        matInput
-                        [(ngModel)]="awayModel.teamName"
-                        (blur)="updateTeamName('away')"
-                    />
-                </mat-form-field>
+    </ag-grid-angular>
 
-                <span class="flex"></span>
-
-                <button
-                    mat-icon-button
-                    matTooltip="Open team options"
-                    [matMenuTriggerFor]="awayMenu"
-                    *ngIf="!!session"
-                >
-                    <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #awayMenu="matMenu" xPosition="before">
-                    <button
-                        mat-menu-item
-                        (click)="upsertTeam('away')"
-                        *ngIf="!checkIfExists(awayModel)"
-                    >
-                        <mat-icon>add</mat-icon>
-                        Save Team
-                    </button>
-
-                    <button
-                        mat-menu-item
-                        (click)="upsertTeam('away')"
-                        *ngIf="checkIfExists(awayModel) && !awayModel.saved"
-                    >
-                        <mat-icon>cloud_upload</mat-icon>
-                        Update Team
-                    </button>
-
-                    <button mat-menu-item (click)="openTeamSelect('away')">
-                        <mat-icon>list</mat-icon>
-                        Select Team
-                    </button>
-
-                    <button mat-menu-item (click)="newTeam('away')">
-                        <mat-icon>restart_alt</mat-icon>
-                        New Team
-                    </button>
-                </mat-menu>
+    <div class="extras-container">
+        <div class="column">
+            <b>Timeouts</b>
+            <div *ngFor="let t of teamModel.timeouts">
+                {{ t }}
             </div>
-
-            <mat-form-field
-                class="input-field"
-                style="padding-right: 4px"
-                subscriptSizing="dynamic"
-            >
-                <mat-label>Head Coach</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="awayModel.coach"
-                    (blur)="updateCoach('away')"
-                />
-            </mat-form-field>
-            <mat-form-field
-                class="input-field"
-                style="padding-right: 4px"
-                subscriptSizing="dynamic"
-            >
-                <mat-label>Assistant Coach 1</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="awayModel.assistant1"
-                    (blur)="updateAssistant1('away')"
-                />
-            </mat-form-field>
-            <mat-form-field class="input-field" subscriptSizing="dynamic">
-                <mat-label>Assistant Coach 2</mat-label>
-                <input
-                    matInput
-                    [(ngModel)]="awayModel.assistant2"
-                    (blur)="updateAssistant2('away')"
-                />
-            </mat-form-field>
         </div>
-
-        <ag-grid-angular
-            class="ag-theme-alpine"
-            domLayout="autoHeight"
-            [rowData]="awayModel.players"
-            [columnDefs]="colDefs"
-            [gridOptions]="gridOptions"
-            (cellValueChanged)="updatePlayers('away')"
-        >
-        </ag-grid-angular>
-
-        <div class="extras-container">
-            <div class="column">
-                <b>Timeouts</b>
-                <div *ngFor="let t of awayModel.timeouts">
-                    {{ t }}
-                </div>
+        <div class="column">
+            <b>Cap Swaps</b>
+            <div *ngFor="let s of teamModel.capSwaps">
+                {{ s }}
             </div>
-            <div class="column">
-                <b>Cap Swaps</b>
-                <div *ngFor="let c of awayModel.capSwaps">
-                    {{ c }}
-                </div>
-            </div>
-            <div class="column">
-                <b>Cards</b>
-                <div *ngFor="let c of awayModel.cards">
-                    {{ c }}
-                </div>
+        </div>
+        <div class="column">
+            <b>Cards</b>
+            <div *ngFor="let c of teamModel.cards">
+                {{ c }}
             </div>
         </div>
     </div>

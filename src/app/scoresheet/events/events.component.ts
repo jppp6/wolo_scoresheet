@@ -18,7 +18,7 @@ export class EventsComponent {
         rowHeight: 24,
         defaultColDef: {
             flex: 1,
-            resizable: false,
+            resizable: true,
             sortable: false,
             suppressMovable: true,
             cellStyle: { padding: 0 },
