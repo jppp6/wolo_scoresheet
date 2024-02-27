@@ -20,19 +20,22 @@ export class CommandComponent {
 
     constructor(private store: Store, private dialog: MatDialog) {}
 
-    readonly quarterPattern = /^quarter|x+$/;
+    readonly quarterPattern = /^q|quarter$/;
+    readonly gameDonePattern = /^game done$/;
     readonly goalPattern =
-        /^([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)(g|goal)(\d{1,4})$/;
+        /^([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)(g|goal)(\d{1,3})$/;
     readonly timeoutPattern =
-        /^(t|to|timeout|time)(b|blue|d|dark|a|away|l|light|w|white|h|home)(\d{1,4})$/;
-    readonly cardPattern =
-        /^([1-9]|1\d|20|coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)(y|yellow|r|red)(\d{1,4})$/;
+        /^(t|timeout)(d|dark|a|away|l|light|h|home)(\d{1,3})$/;
+    readonly redCardPattern =
+        /^([1-9]|1\d|20|coach|c|assistant1|a1|assistant2|a2)(d|dark|a|away|l|light|h|home)(r|red)(\d{1,3})$/;
+    readonly yellowCardPattern =
+        /^([1-9]|1\d|20|coach|c|assistant1|a1|assistant2|a2)(d|dark|a|away|l|light|h|home)(y|yellow)(\d{1,3})$/;
     readonly capSwapPattern =
-        /^([1-9]|1\d|20)(s|swap)([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)(\d{1,4})$/;
+        /^([1-9]|1\d|20)(s|swap)([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)(\d{1,3})$/;
     readonly exclusionPattern =
-        /^([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)(e|exclusion|k|kick|kickout)(\d{1,4})$/;
+        /^([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)(e|exclusion)(\d{1,3})$/;
     readonly brutalityPattern =
-        /^([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)(b|brutal|brutality)(\d{1,4})$/;
+        /^([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)(b|brutality)(\d{1,3})$/;
 
     ngOnInit() {
         this.options = this.command.valueChanges.pipe(
@@ -51,9 +54,7 @@ export class CommandComponent {
                 if (/^([1-9]|1\d|20)$/.test(value)) {
                     return [value + 'home', value + 'away', value + 'swap'];
                 } else if (
-                    /^([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
-                        value
-                    )
+                    /^([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)$/.test(value)
                 ) {
                     return [
                         value + 'goal',
@@ -63,7 +64,7 @@ export class CommandComponent {
                         value + 'red',
                     ];
                 } else if (
-                    /^([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)(g|goal|e|exclusion|k|kick|kickout|b|brutal|brutality)$/.test(
+                    /^([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)(g|goal|e|exclusion|b|brutality)$/.test(
                         value
                     )
                 ) {
@@ -71,9 +72,7 @@ export class CommandComponent {
                 } else if (/^(t|to|timeout|time)$/.test(value)) {
                     return [value + 'home', value + 'away'];
                 } else if (
-                    /^(t|to|timeout|time)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
-                        value
-                    )
+                    /^(t|timeout)(d|dark|a|away|l|light|h|home)$/.test(value)
                 ) {
                     return [value + '(?time?)'];
                 } else if (/^([1-9]|1\d|20)(s|swap)$/.test(value)) {
@@ -83,25 +82,23 @@ export class CommandComponent {
                 ) {
                     return [value + 'home', value + 'away'];
                 } else if (
-                    /^([1-9]|1\d|20)(s|swap)([1-9]|1\d|20)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
+                    /^([1-9]|1\d|20)(s|swap)([1-9]|1\d|20)(d|dark|a|away|l|light|h|home)$/.test(
                         value
                     )
                 ) {
                     return [value + '(?time?)'];
                 } else if (
-                    /^(coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)$/.test(
-                        value
-                    )
+                    /^(coach|c|assistant1|a1|assistant2|a2)$/.test(value)
                 ) {
                     return [value + 'home', value + 'away'];
                 } else if (
-                    /^([1-9]|1\d|20|coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)$/.test(
+                    /^([1-9]|1\d|20|coach|c|assistant1|a1|assistant2|a2)(d|dark|a|away|l|light|h|home)$/.test(
                         value
                     )
                 ) {
                     return [value + 'yellow', value + 'red'];
                 } else if (
-                    /^([1-9]|1\d|20|coach|hc|c|assistant1|ac1|a1|assistant2|ac2|a2)(b|blue|d|dark|a|away|l|light|w|white|h|home)(y|yellow|r|red)$/.test(
+                    /^([1-9]|1\d|20|coach|c|assistant1|a1|assistant2|a2)(d|dark|a|away|l|light|h|home)(y|yellow|r|red)$/.test(
                         value
                     )
                 ) {
@@ -137,8 +134,8 @@ export class CommandComponent {
             this.store.dispatch(
                 new Events.Timeout(this.colorP(m[2]), this.timeP(m[3]))
             );
-        } else if (this.cardPattern.test(v)) {
-            const m = v.match(this.cardPattern);
+        } else if (this.redCardPattern.test(v)) {
+            const m = v.match(this.redCardPattern);
             if (!m) {
                 return;
             }
@@ -146,7 +143,20 @@ export class CommandComponent {
                 new Events.Card(
                     this.coachP(m[1]),
                     this.colorP(m[2]),
-                    this.cardP(m[3]),
+                    'red',
+                    this.timeP(m[4])
+                )
+            );
+        } else if (this.yellowCardPattern.test(v)) {
+            const m = v.match(this.yellowCardPattern);
+            if (!m) {
+                return;
+            }
+            this.store.dispatch(
+                new Events.Card(
+                    this.coachP(m[1]),
+                    this.colorP(m[2]),
+                    'yellow',
                     this.timeP(m[4])
                 )
             );
@@ -179,6 +189,10 @@ export class CommandComponent {
             this.store.dispatch(
                 new Events.Brutality(m[1], this.colorP(m[2]), this.timeP(m[4]))
             );
+        } else if (this.gameDonePattern.test(v)) {
+            // this.store.dispatch(
+            //     new Game.Done(m[1], this.colorP(m[2]), this.timeP(m[4]))
+            // );
         } else {
             return;
         }
@@ -194,9 +208,6 @@ export class CommandComponent {
             ? 'Assistant 2'
             : e;
     }
-    cardP(e: string): 'red' | 'yellow' {
-        return ['r', 'red'].includes(e) ? 'red' : 'yellow';
-    }
 
     timeP(e: string): string {
         return 1 === e.length
@@ -205,8 +216,6 @@ export class CommandComponent {
             ? `0:${e}`
             : 3 === e.length
             ? `${e[0]}:${e.substring(1)}`
-            : 4 === e.length
-            ? `${e.substring(0, 2)}:${e.substring(2)}`
             : '';
     }
 

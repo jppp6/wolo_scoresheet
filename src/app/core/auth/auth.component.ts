@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { SupabaseService } from '../services/supabase.service';
 
 @Component({
@@ -13,7 +14,8 @@ export class AuthDialog {
 
     constructor(
         private readonly dialogRef: MatDialogRef<AuthDialog>,
-        private readonly supabase: SupabaseService
+        private readonly supabase: SupabaseService,
+        private readonly _snackBar: MatSnackBar
     ) {}
 
     async signUp(): Promise<void> {
@@ -27,11 +29,13 @@ export class AuthDialog {
                 throw error;
             } else {
                 this.dialogRef.close();
-                alert('Check your email for the login link!');
+                this._snackBar.open('Check your email for the login link!');
             }
         } catch (error) {
             if (error instanceof Error) {
-                alert(error.message);
+                this._snackBar.open(
+                    'Sorry! There was an error trying to login, please try again.'
+                );
             }
         } finally {
             this.signInEmail.reset();

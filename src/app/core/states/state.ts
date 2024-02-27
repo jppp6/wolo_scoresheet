@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
     Action,
     Selector,
@@ -28,7 +29,10 @@ import { Utils } from '../utils/utils';
 export class WoloState {
     session: Session | null = null;
 
-    constructor(private readonly supabase: SupabaseService) {
+    constructor(
+        private readonly supabase: SupabaseService,
+        private readonly _snackBar: MatSnackBar
+    ) {
         this.supabase.authChanges((_, session) => {
             this.session = session;
         });
@@ -188,10 +192,10 @@ export class WoloState {
         const q = state.info.quarter + 1;
 
         if (q === 5 && state.info.homeScore !== state.info.awayScore) {
-            alert('OT is not possible, the score is not tied.');
+            this._snackBar.open('OT is not possible, the score is not tied.');
             return;
         } else if (q === 6) {
-            alert('You cannot go passed OT');
+            this._snackBar.open('You cannot go passed OT.');
             return;
         }
         const quarterEvent: EventsModel = {

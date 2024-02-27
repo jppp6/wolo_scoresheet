@@ -1,61 +1,43 @@
-<h2 mat-dialog-title>Wolo Gamesheet Help & Information</h2>
+<h2 mat-dialog-title>Wolo Scoresheet Help & Information</h2>
 <mat-dialog-content>
     <p>
-        <a class="bold">Goals:</a><br />
-        Input is: player number, team color, goal and time.<br />
-        Player number options: 1 to 20<br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Goal options: g, goal<br />
-        Examples: 6bg100, 4whiteg10, 10darkgoal700, 14lgoal123
+        <a class="bold">Goal, Exclusion, Brutality Format</a><br />
+        Input Format: &lt;player&gt;&lt;team&gt;&lt;event&gt;&lt;time&gt;<br />
+        Player options: 1-20<br />
+        Team options: l/h/d/a (light/home/dark/away)<br />
+        Event options:<br />
+        -g: goal <br />
+        -e: exclusion <br />
+        -b: brutality<br />
+        Time options: 0 to 999 (0:00 to 9:99)
     </p>
     <p>
-        <a class="bold">Next Quarter:</a><br />
-        Input is: quarter, x (it can be repeated)<br />
-        Examples: quarter, x, Xx, XXXXXX
+        <a class="bold">Next Quarter Format</a><br />
+        Input Format: q (quarter) <br />
     </p>
     <p>
-        <a class="bold">Timeouts:</a><br />
-        Input is: timeout, team color and time. <br />
-        Timeout options: t, to, timeout, time <br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Examples: tb100, timeoutwhite123, todark700, timew111
+        <a class="bold">Timeout Format</a><br />
+        Input Format: &lt;timeout&gt;&lt;team&gt;&lt;time&gt;<br />
+        Timeout options: t (timeout) <br />
+        Team options: l/h/d/a (light/home/dark/away)<br />
+        Time options: 0 to 999 (0:00 to 9:99)
     </p>
     <p>
-        <a class="bold">Cards:</a><br />
-        Input is: person, team color, type of card and time. <br />
-        Person options: 1-20, coach, hc, assistant1, ac1, assistant2, ac2 <br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Type of card options: r, red, y, yellow.<br />
-        Examples: 6lightred100, acdarkred111, aabluey606, hcwhitered111
+        <a class="bold">Card Fromat</a><br />
+        Input Format:&lt;person&gt;&lt;team&gt;&lt;card&gt;&lt;time&gt;<br />
+        Person options: 1-20/c/a1/a2 (coach, assistant1, assistant2) <br />
+        Team options: l/h/d/a (light/home/dark/away)<br />
+        Card options: r/y (red,yellow)<br />
     </p>
     <p>
-        <a class="bold">Cap Swap:</a><br />
+        <a class="bold">Cap Swap Format</a><br />
+        Input Format:
+        &lt;player1&gt;&lt;swap&gt;&lt;player1&gt;&lt;team&gt;&lt;time&gt;<br />
         Input is: player1, swap, player2, team color and time.<br />
-        Player options: 1-20<br />
-        Swap options: s, swap<br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Examples: 6swap9b100, 2s10blue111
-    </p>
-    <p>
-        <a class="bold">Exclusion:</a><br />
-        Input is: player, team color, exclusion and time.<br />
-        Player options: 1-20<br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Exclusions options: e, exclusion, k, kick, kickout<br />
-        Examples: 15blueexclusion111, 6lightkickout120, 12be600
-    </p>
-    <p>
-        <a class="bold">Brutality:</a><br />
-        Input is: player, team color, brutality and time.<br />
-        Player options: 1-20<br />
-        Team color options: l, light, w, white, h, home, d, dark, b, blue, a,
-        away<br />
-        Brutality options: b, brutal, brutality<br />
-        Examples: 6bluebrutal111, 7whiteb500, 10bb10
+        Player1 options: 1-20<br />
+        Swap options: s (swap)<br />
+        Player2 options: 1-20<br />
+        Team options: l/h/d/a (light/home/dark/away)<br />
+        Time options: 0 to 999 (0:00 to 9:99)
     </p>
 </mat-dialog-content>

@@ -17,9 +17,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxsModule } from '@ngxs/store';
 import { AgGridAngular } from 'ag-grid-angular';
 
-import { environment } from 'src/environments/environment';
-
 import { MatMenuModule } from '@angular/material/menu';
+import {
+    MAT_SNACK_BAR_DEFAULT_OPTIONS,
+    MatSnackBarModule,
+} from '@angular/material/snack-bar';
+import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthDialog } from './core/auth/auth.component';
@@ -59,6 +62,7 @@ import { TeamComponent } from './scoresheet/team/team.component';
         MatButtonModule,
         MatCardModule,
         MatDatepickerModule,
+        MatSnackBarModule,
         MatDialogModule,
         MatDividerModule,
         MatFormFieldModule,
@@ -71,7 +75,12 @@ import { TeamComponent } from './scoresheet/team/team.component';
         ReactiveFormsModule,
         AppRoutingModule,
     ],
-    providers: [],
+    providers: [
+        {
+            provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+            useValue: { duration: 3000 },
+        },
+    ],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
