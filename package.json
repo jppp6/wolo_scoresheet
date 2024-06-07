@@ -38,6 +38,7 @@
         "@supabase/gotrue-js": "2.61.0",
         "@types/jasmine": "~4.3.0",
         "@types/uuid": "^9.0.8",
+        "angular-cli-ghpages": "^2.0.0",
         "jasmine-core": "~4.6.0",
         "karma": "~6.4.0",
         "karma-chrome-launcher": "~3.2.0",
